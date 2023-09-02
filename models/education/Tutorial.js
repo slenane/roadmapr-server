@@ -16,6 +16,10 @@ const tutorialSchema = Schema({
     ref: "Education",
     required: true,
   },
+  pin: {
+    pinned: Boolean,
+    position: Number,
+  },
   type: { type: String, default: "tutorial" },
 });
 

@@ -38,12 +38,7 @@ const getDashboard = async (req, res) => {
         // ];
 
         const dashboard = {
-          education: {
-            books: education.books,
-            courses: education.courses,
-            degrees: education.degrees,
-            tutorials: education.tutorials,
-          },
+          education: education.items,
           employment: employment.employmentList,
           projects: projects.projectList,
           github: [],

@@ -46,20 +46,46 @@ const createEducationItem = async (req, res) => {
 const updateEducationItem = async (req, res) => {
   if (!req.body.data) return;
 
-  let educationItem = req.body.data;
+  const educationItem = req.body.data;
   const id = req.body.data._id;
 
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send("No item with that id");
 
-  educationItem = await EducationItem.findByIdAndUpdate(
+  await EducationItem.findByIdAndUpdate(
     id,
     { ...educationItem, id },
     { new: true }
   );
 
   try {
-    Education.findById(educationItem.education)
+    Education.findById(req.params.id)
+      .populate("items")
+      .exec((err, education) => {
+        res.status(201).json(education);
+      });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+const bulkUpdateEducationItems = async (req, res) => {
+  if (!req.body.data) return;
+
+  const educationItems = req.body.data;
+
+  educationItems.forEach(async (item) => {
+    const id = item._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).send("No item with that id");
+    }
+
+    await EducationItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
+  });
+
+  try {
+    Education.findById(req.params.id)
       .populate("items")
       .exec((err, education) => {
         res.status(201).json(education);
@@ -112,5 +138,6 @@ module.exports = {
   createEducationItem,
   updateEducationItem,
   deleteEducationItem,
+  bulkUpdateEducationItems,
   // getItemDetails,
 };

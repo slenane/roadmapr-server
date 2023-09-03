@@ -12,7 +12,7 @@ const educationItemSchema = Schema({
   description: String,
   github: String,
   stack: [Schema.Types.Mixed],
-  pinned_position: Number,
+  pinned: Boolean,
   status: "todo" | "inProgress" | "done",
   position: Number,
   type: String,

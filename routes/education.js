@@ -4,6 +4,7 @@ const {
   createEducationItem,
   updateEducationItem,
   deleteEducationItem,
+  bulkUpdateEducationItems,
   // getItemDetails,
 } = require("../controllers/education.js");
 const { expressjwt: jwt } = require("express-jwt");
@@ -20,6 +21,7 @@ router.get("/:id", isAuth, getEducation);
 // router.post("/get-details", getItemDetails);
 router.post("/:id", isAuth, createEducationItem);
 router.patch("/edit/:id", isAuth, updateEducationItem);
+router.patch("/bulk-edit/:id", isAuth, bulkUpdateEducationItems);
 router.post("/remove/:id", isAuth, deleteEducationItem);
 
 module.exports = router;

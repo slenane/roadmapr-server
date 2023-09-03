@@ -13,6 +13,8 @@ const educationItemSchema = Schema({
   github: String,
   stack: [Schema.Types.Mixed],
   pinned_position: Number,
+  status: "todo" | "inProgress" | "done",
+  position: Number,
   type: String,
   education: {
     type: Schema.Types.ObjectId,

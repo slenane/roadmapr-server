@@ -3,6 +3,7 @@ const {
   getProjects,
   createProjectItem,
   updateProjectItem,
+  bulkUpdateProjectItems,
   deleteProjectItem,
 } = require("../controllers/projects.js");
 const { expressjwt: jwt } = require("express-jwt");
@@ -18,6 +19,7 @@ router.get("", isAuth, getProjects);
 router.get("/:id", isAuth, getProjects);
 router.post("/:id", isAuth, createProjectItem);
 router.patch("/edit/:id", isAuth, updateProjectItem);
+router.patch("/bulk-edit/:id", isAuth, bulkUpdateProjectItems);
 router.post("/remove/:id", isAuth, deleteProjectItem);
 
 module.exports = router;

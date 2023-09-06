@@ -75,6 +75,32 @@ const updateEmploymentItem = async (req, res) => {
   }
 };
 
+const bulkUpdateEmploymentItems = async (req, res) => {
+  if (!req.body.data) return;
+
+  const employmentItems = req.body.data;
+
+  employmentItems.forEach(async (item) => {
+    const id = item._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).send("No item with that id");
+    }
+
+    await EmploymentItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
+  });
+
+  try {
+    Employment.findById(req.params.id)
+      .populate("employmentList")
+      .exec((err, employment) => {
+        res.status(201).json(employment);
+      });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
 const deleteEmploymentItem = async (req, res) => {
   let employmentItem = req.body.data;
   let employmentId = employmentItem.employment;
@@ -99,5 +125,6 @@ module.exports = {
   getEmployment,
   createEmploymentItem,
   updateEmploymentItem,
+  bulkUpdateEmploymentItems,
   deleteEmploymentItem,
 };

@@ -9,12 +9,9 @@ const getDashboard = async (req, res) => {
   try {
     User.findById(req.auth._id, async (err, user) => {
       if (user) {
-        const education = await Education.findById(user.education).populate([
-          "books",
-          "courses",
-          "degrees",
-          "tutorials",
-        ]);
+        const education = await Education.findById(user.education).populate(
+          "items"
+        );
         const employment = await Employment.findById(user.employment).populate(
           "employmentList"
         );
@@ -41,12 +38,7 @@ const getDashboard = async (req, res) => {
         // ];
 
         const dashboard = {
-          education: {
-            books: education.books,
-            courses: education.courses,
-            degrees: education.degrees,
-            tutorials: education.tutorials,
-          },
+          education: education.items,
           employment: employment.employmentList,
           projects: projects.projectList,
           github: [],

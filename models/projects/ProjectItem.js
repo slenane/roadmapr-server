@@ -12,8 +12,15 @@ const projectItemSchema = Schema({
   startDate: Date,
   title: String,
   tagLine: String,
-  todo: String,
-  projects: String,
+  pinned: Boolean,
+  status: "todo" | "inProgress" | "done",
+  position: Number,
+  type: String,
+  projects: {
+    type: Schema.Types.ObjectId,
+    ref: "Projects",
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("ProjectItem", projectItemSchema);

@@ -6,7 +6,7 @@ const EducationItem = require("../models/education/EducationItem.js");
 const getEducation = (req, res) => {
   try {
     Education.find({ user: req.auth._id })
-      .populate("items")
+      .populate("educationList")
       .exec((err, education) => {
         if (err) {
           education = new Education({ user: req.auth._id });
@@ -31,9 +31,9 @@ const createEducationItem = async (req, res) => {
     await educationItem.save();
 
     Education.findById(educationItem.education)
-      .populate("items")
+      .populate("educationList")
       .exec((err, education) => {
-        education["items"].push(educationItem);
+        education["educationList"].push(educationItem);
         education.save();
 
         res.status(200).json(education);
@@ -60,7 +60,7 @@ const updateEducationItem = async (req, res) => {
 
   try {
     Education.findById(req.params.id)
-      .populate("items")
+      .populate("educationList")
       .exec((err, education) => {
         res.status(201).json(education);
       });
@@ -86,7 +86,7 @@ const bulkUpdateEducationItems = async (req, res) => {
 
   try {
     Education.findById(req.params.id)
-      .populate("items")
+      .populate("educationList")
       .exec((err, education) => {
         res.status(201).json(education);
       });
@@ -109,7 +109,7 @@ const deleteEducationItem = async (req, res) => {
 
   try {
     Education.findById(educationId)
-      .populate("items")
+      .populate("educationList")
       .exec((err, education) => {
         res.status(200).json(education);
       });

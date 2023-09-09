@@ -29,23 +29,33 @@ const userSchema = new Schema({
   location: String,
   languagesSpoken: [
     {
-      type: String,
+      language: String,
+      level: String,
     },
   ],
-  cv: String,
-  skills: [
+  links: {
+    cv: String,
+    portfolio: String,
+    github: String,
+    twitter: String,
+    linkedIn: String,
+  },
+  interests: {
+    professional_interests: Array,
+    personal_interests: Array,
+  },
+  previousEducation: [
     {
-      type: String,
+      school: String,
+      subject: String,
+      level: String,
     },
   ],
-  github: String,
-  twitter: String,
-  linkedIn: String,
+  darkMode: Boolean,
+  notifications: Boolean,
   education: String,
   employment: String,
   projects: String,
-  theme: String,
-  notifications: String,
   _id: Schema.Types.ObjectId,
 });
 

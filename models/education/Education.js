@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const educationSchema = Schema({
-  items: [
+  educationList: [
     {
       type: Schema.Types.ObjectId,
       ref: "EducationItem",

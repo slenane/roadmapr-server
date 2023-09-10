@@ -51,6 +51,7 @@ const userSchema = new Schema({
       level: String,
     },
   ],
+  stack: Array,
   darkMode: Boolean,
   notifications: Boolean,
   education: String,

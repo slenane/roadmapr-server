@@ -6,8 +6,9 @@ const Projects = require("../models/projects/Projects.js");
 const axios = require("axios");
 
 const getDashboard = async (req, res) => {
+  const id = req.auth._id;
   try {
-    User.findById(req.auth._id, async (err, user) => {
+    User.findById(id, async (err, user) => {
       if (user) {
         const education = await Education.findById(user.education).populate(
           "educationList"
@@ -19,6 +20,25 @@ const getDashboard = async (req, res) => {
           "projectList"
         );
 
+        const stackList = [
+          ...education.educationList.map((item) => item.stack),
+          ...employment.employmentList.map((item) => item.stack),
+          ...projects.projectList.map((item) => item.stack),
+        ].flat(Infinity);
+
+        const updatedStack = [];
+
+        stackList.forEach((language) => {
+          if (!updatedStack.some((item) => item.name === language.name)) {
+            updatedStack.push(language);
+          }
+        });
+
+        await User.findByIdAndUpdate(
+          id,
+          { stack: updatedStack, id },
+          { new: true }
+        );
         // const githubResponse = await axios.get(
         //   `https://api.github.com/users/${user.github}/repos?per_page=100`
         // );
@@ -38,7 +58,7 @@ const getDashboard = async (req, res) => {
         // ];
 
         const dashboard = {
-          education: education.items,
+          education: education.educationList,
           employment: employment.employmentList,
           projects: projects.projectList,
           github: [],

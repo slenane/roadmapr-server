@@ -62,7 +62,7 @@ const login = async (req, res, next) => {
     // If a user is found
     if (user) {
       const token = user.generateJwt();
-      res.status(200).json({ token });
+      res.status(200).json({ token, user });
     } else {
       // If user is not found
       res.status(401).json(info);

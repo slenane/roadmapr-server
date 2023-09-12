@@ -52,7 +52,7 @@ const userSchema = new Schema({
     },
   ],
   stack: Array,
-  darkMode: Boolean,
+  theme: "light" | "dark",
   notifications: Boolean,
   education: String,
   employment: String,

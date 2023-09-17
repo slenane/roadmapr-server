@@ -47,7 +47,7 @@ app.use(
 );
 app.use(
   mod.cookieSession({
-    name: "sess", //name of the cookie containing access token in the //browser
+    name: "github-session", //name of the cookie containing access token in the //browser
     secret: "asdfgh",
     httpOnly: true,
   })

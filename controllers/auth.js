@@ -52,7 +52,7 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  mod.passport.authenticate("local", function (err, user, info) {
+  mod.passport.authenticate("local", (err, user, info) => {
     // If Passport throws/catches an error
     if (err) {
       res.status(404).json(err);
@@ -77,8 +77,6 @@ const authPage = (req, res) => {
     authUrl:
       "https://github.com/login/oauth/authorize?client_id=" +
       mod.config.CLIENT_ID +
-      "&redirect_uri=" +
-      mod.config.REDIRECT_URI +
       "&scope=read:user&allow_signup=" +
       true +
       "&state=" +
@@ -87,7 +85,7 @@ const authPage = (req, res) => {
 };
 
 const getAccessToken = (req, res) => {
-  let state = req.headers["x-xsrf-token"];
+  const state = req.headers["x-xsrf-token"];
   mod
     .axios({
       url:
@@ -97,20 +95,18 @@ const getAccessToken = (req, res) => {
         mod.config.CLIENT_SECRET +
         "&code=" +
         req.body.code +
-        "&redirect_uri=" +
-        mod.config.REDIRECT_URI +
         "&state=" +
         state,
       method: "POST",
       headers: { Accept: "application/json" },
     })
-    .then(function (resp) {
+    .then((resp) => {
       if (resp.data.access_token) {
         req.session.token = resp.data.access_token;
       }
       res.send(resp.data);
     })
-    .catch(function (err) {
+    .catch((err) => {
       res.send(err);
     });
 };
@@ -123,11 +119,11 @@ const getUserDetails = (req, res) => {
         method: "GET",
         headers: { Authorization: "token" + " " + req.session.token },
       })
-      .then(function (resp) {
+      .then((resp) => {
         res.cookie("login", resp.data.login, { httpOnly: true });
         res.send(resp.data);
       })
-      .catch(function (err) {
+      .catch((err) => {
         res.send(err);
       });
   } else {
@@ -137,7 +133,7 @@ const getUserDetails = (req, res) => {
 
 const logout = (req, res) => {
   req.session = null;
-  res.clearCookie("sess");
+  res.clearCookie("github-session");
   res.clearCookie("login");
   res.status(200).send();
 };

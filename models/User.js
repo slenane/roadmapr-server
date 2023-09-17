@@ -53,6 +53,7 @@ const userSchema = new Schema({
   ],
   stack: Array,
   theme: "light" | "dark",
+  preferredLanguage: "en" | "es" | "pt",
   notifications: Boolean,
   education: String,
   employment: String,

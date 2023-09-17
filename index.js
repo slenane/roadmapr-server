@@ -1,13 +1,6 @@
 // APP SETUP
-require("dotenv").config();
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-const express = require("express");
-const cors = require("cors");
-const passport = require("passport");
-// const session = require("express-session");
-// const MongoDBStore = require("connect-mongodb-session")(session);
-// const User = require("./models/User.js");
+const mod = require("./modules").module;
+const app = mod.express();
 require("./middleware/auth.js");
 
 // ROUTES FILES
@@ -20,28 +13,45 @@ const projectsRoutes = require("./routes/projects.js");
 const settingsRoutes = require("./routes/settings.js");
 
 // DATABASE SETUP
-const MONGODB_URI = process.env.CONNECTION_URL;
+const MONGODB_URI = mod.config.CONNECTION_URL;
 // Session store with mongo
 // const mongoStore = new MongoDBStore({
 //   uri: MONGODB_URI,
 //   collection: "sessions",
 // });
 
-mongoose.connect(MONGODB_URI, {
+mod.mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-const db = mongoose.connection;
+const db = mod.mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => console.log("Database connected"));
 
 // APP CONFIG
-const app = express();
-app.use(passport.initialize());
-app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
+app.use(mod.passport.initialize());
+app.use(mod.bodyParser.json({ limit: "30mb", extended: true }));
+app.use(mod.bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.use(mod.cors());
+app.use(mod.logger("dev"));
+app.use(mod.express.json());
+app.use(mod.express.urlencoded({ extended: false }));
+app.use(mod.cookieParser());
+app.use(mod.express.static(mod.path.join(__dirname, "public")));
+app.use(
+  mod.cors({
+    origin: ["http://localhost:4200"],
+    methods: ["GET", "PUT", "POST", "DELETE"],
+  })
+);
+app.use(
+  mod.cookieSession({
+    name: "sess", //name of the cookie containing access token in the //browser
+    secret: "asdfgh",
+    httpOnly: true,
+  })
+);
 
 // ROUTES
 app.use("/", authRoutes);

@@ -1,4 +1,4 @@
-const passport = require("passport");
+const mod = require("../modules").module;
 const User = require("../models/User.js");
 const Education = require("../models/education/Education.js");
 const Employment = require("../models/employment/Employment.js");
@@ -52,7 +52,7 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  passport.authenticate("local", function (err, user, info) {
+  mod.passport.authenticate("local", function (err, user, info) {
     // If Passport throws/catches an error
     if (err) {
       res.status(404).json(err);
@@ -70,4 +70,83 @@ const login = async (req, res, next) => {
   })(req, res, next);
 };
 
-module.exports = { register, login };
+const authPage = (req, res) => {
+  const state = mod.crypto.randomBytes(16).toString("hex");
+  res.cookie("XSRF-TOKEN", state);
+  res.send({
+    authUrl:
+      "https://github.com/login/oauth/authorize?client_id=" +
+      mod.config.CLIENT_ID +
+      "&redirect_uri=" +
+      mod.config.REDIRECT_URI +
+      "&scope=read:user&allow_signup=" +
+      true +
+      "&state=" +
+      state,
+  });
+};
+
+const getAccessToken = (req, res) => {
+  let state = req.headers["x-xsrf-token"];
+  mod
+    .axios({
+      url:
+        "https://github.com/login/oauth/access_token?client_id=" +
+        mod.config.CLIENT_ID +
+        "&client_secret=" +
+        mod.config.CLIENT_SECRET +
+        "&code=" +
+        req.body.code +
+        "&redirect_uri=" +
+        mod.config.REDIRECT_URI +
+        "&state=" +
+        state,
+      method: "POST",
+      headers: { Accept: "application/json" },
+    })
+    .then(function (resp) {
+      if (resp.data.access_token) {
+        req.session.token = resp.data.access_token;
+      }
+      res.send(resp.data);
+    })
+    .catch(function (err) {
+      res.send(err);
+    });
+};
+
+const getUserDetails = (req, res) => {
+  if (req.session.token) {
+    mod
+      .axios({
+        url: "https://api.github.com/user",
+        method: "GET",
+        headers: { Authorization: "token" + " " + req.session.token },
+      })
+      .then(function (resp) {
+        res.cookie("login", resp.data.login, { httpOnly: true });
+        res.send(resp.data);
+      })
+      .catch(function (err) {
+        res.send(err);
+      });
+  } else {
+    res.status(401).send();
+  }
+};
+
+const logout = (req, res) => {
+  req.session = null;
+  res.clearCookie("sess");
+  res.clearCookie("login");
+  res.status(200).send();
+};
+
+module.exports = {
+  register,
+  login,
+  authPage,
+  getAccessToken,
+  getUserDetails,
+  logout,
+};

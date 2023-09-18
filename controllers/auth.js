@@ -1,4 +1,7 @@
-const mod = require("../modules").module;
+const axios = require("axios");
+const config = require("../config");
+const crypto = require("crypto");
+const passport = require("passport");
 const User = require("../models/User.js");
 const Education = require("../models/education/Education.js");
 const Employment = require("../models/employment/Employment.js");
@@ -52,7 +55,7 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  mod.passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", (err, user, info) => {
     // If Passport throws/catches an error
     if (err) {
       res.status(404).json(err);
@@ -71,12 +74,12 @@ const login = async (req, res, next) => {
 };
 
 const authPage = (req, res) => {
-  const state = mod.crypto.randomBytes(16).toString("hex");
+  const state = crypto.randomBytes(16).toString("hex");
   res.cookie("XSRF-TOKEN", state);
   res.send({
     authUrl:
       "https://github.com/login/oauth/authorize?client_id=" +
-      mod.config.CLIENT_ID +
+      config.GITHUB_CLIENT_ID +
       "&scope=read:user&allow_signup=" +
       true +
       "&state=" +
@@ -86,20 +89,19 @@ const authPage = (req, res) => {
 
 const getAccessToken = (req, res) => {
   const state = req.headers["x-xsrf-token"];
-  mod
-    .axios({
-      url:
-        "https://github.com/login/oauth/access_token?client_id=" +
-        mod.config.CLIENT_ID +
-        "&client_secret=" +
-        mod.config.CLIENT_SECRET +
-        "&code=" +
-        req.body.code +
-        "&state=" +
-        state,
-      method: "POST",
-      headers: { Accept: "application/json" },
-    })
+  axios({
+    url:
+      "https://github.com/login/oauth/access_token?client_id=" +
+      config.GITHUB_CLIENT_ID +
+      "&client_secret=" +
+      config.GITHUB_CLIENT_SECRET +
+      "&code=" +
+      req.body.code +
+      "&state=" +
+      state,
+    method: "POST",
+    headers: { Accept: "application/json" },
+  })
     .then((resp) => {
       if (resp.data.access_token) {
         req.session.token = resp.data.access_token;
@@ -113,13 +115,14 @@ const getAccessToken = (req, res) => {
 
 const getUserDetails = (req, res) => {
   if (req.session.token) {
-    mod
-      .axios({
-        url: "https://api.github.com/user",
-        method: "GET",
-        headers: { Authorization: "token" + " " + req.session.token },
-      })
+    axios({
+      url: "https://api.github.com/user",
+      method: "GET",
+      headers: { Authorization: "token" + " " + req.session.token },
+    })
       .then((resp) => {
+        console.log(resp);
+
         res.cookie("login", resp.data.login, { httpOnly: true });
         res.send(resp.data);
       })

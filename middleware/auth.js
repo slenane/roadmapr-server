@@ -1,5 +1,7 @@
-var passport = require("passport");
-var LocalStrategy = require("passport-local").Strategy;
+const passport = require("passport");
+// const config = require("../config");
+const LocalStrategy = require("passport-local").Strategy;
+// const GitHubStrategy = require("passport-github2").Strategy;
 const User = require("../models/User.js");
 
 passport.use(
@@ -33,3 +35,31 @@ passport.use(
     }
   )
 );
+
+// passport.use(
+//   new GitHubStrategy(
+//     {
+//       clientID: config.GITHUB_CLIENT_ID,
+//       clientSecret: config.GITHUB_CLIENT_SECRET,
+//       callbackURL: "http://localhost:4200/redirect",
+//     },
+//     function (accessToken, refreshToken, profile, done) {
+//       console.log(profile);
+
+//       User.findOne({ email: profile.email }, async (err, user) => {
+//         if (err) {
+//           return done(err);
+//         }
+//         // Return if user not found in database
+//         if (!user) {
+//           return done(null, false, {
+//             message: "User not found",
+//           });
+//         }
+
+//         // If credentials are correct, return the user object
+//         return done(null, user);
+//       });
+//     }
+//   )
+// );

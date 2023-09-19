@@ -3,15 +3,12 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const logger = require("morgan");
-// const axios = require("axios");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const config = require("./config");
-// const crypto = require("crypto");
 const cookieSession = require("cookie-session");
 const mongoose = require("mongoose");
 const passport = require("passport");
-// const GitHubStrategy = require("passport-github2").Strategy;
 require("./middleware/auth.js");
 
 const app = express();
@@ -26,7 +23,7 @@ const projectsRoutes = require("./routes/projects.js");
 const settingsRoutes = require("./routes/settings.js");
 
 // DATABASE SETUP
-const MONGODB_URI = config.CONNECTION_URL;
+const MONGODB_URI = config.DB_CONNECTION_URL;
 // Session store with mongo
 // const mongoStore = new MongoDBStore({
 //   uri: MONGODB_URI,

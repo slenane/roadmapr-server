@@ -120,11 +120,66 @@ const getUserDetails = (req, res) => {
       method: "GET",
       headers: { Authorization: "token" + " " + req.session.token },
     })
-      .then((resp) => {
-        console.log(resp);
+      .then((githubResponse) => {
+        User.findOne(
+          { githubId: githubResponse.data.id },
+          async (err, user) => {
+            console.log(user);
+            if (err) {
+              console.log("HERE");
+              res.send(err);
+            }
 
-        res.cookie("login", resp.data.login, { httpOnly: true });
-        res.send(resp.data);
+            if (!user) {
+              console.log("!USER");
+              User.init();
+              user = new User({
+                githubId: githubResponse.data.id,
+                email: githubResponse.data.email,
+                username: githubResponse.data.login,
+                name: githubResponse.data.name,
+                coverImage: "",
+                profileImage: "",
+                role: "",
+                bio: "",
+                nationality: "",
+                location: "",
+                languagesSpoken: [],
+                cv: "",
+                skills: [],
+                github: githubResponse.data.login,
+                twitter: "",
+                linkedIn: "",
+                theme: "light",
+                notifications: false,
+              });
+
+              const employment = new Employment({ user: user._id });
+              const projects = new Projects({ user: user._id });
+              const education = new Education({ user: user._id });
+
+              user.employment = employment._id;
+              user.projects = projects._id;
+              user.education = education._id;
+
+              try {
+                console.log(user);
+                console.log("NEW USER");
+                await education.save();
+                await employment.save();
+                await projects.save();
+                await user.save();
+              } catch (err) {
+                console.log(err);
+                return res.send(err);
+              }
+            }
+            console.log("GENERATE TOKEN");
+
+            const token = user.generateJwt();
+            return res.status(200).json({ token, user });
+          }
+        );
       })
       .catch((err) => {
         res.send(err);

@@ -58,7 +58,7 @@ const userSchema = new Schema({
   education: String,
   employment: String,
   projects: String,
-  _id: Schema.Types.ObjectId,
+  githubId: String,
 });
 
 userSchema.methods.setPassword = function (password) {
@@ -86,7 +86,7 @@ userSchema.methods.generateJwt = function () {
       name: this.name,
       exp: parseInt(expiry.getTime() / 1000),
     },
-    process.env.SECRET
+    process.env.DB_SECRET
   );
 };
 

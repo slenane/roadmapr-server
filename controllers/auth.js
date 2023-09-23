@@ -73,6 +73,16 @@ const login = async (req, res, next) => {
   })(req, res, next);
 };
 
+const isUniqueUsername = (req, res) => {
+  User.find({}, { username: 1, _id: 0 }, (err, users) => {
+    const matchingUsername = users.find(
+      (user) => user.username === req.params.username
+    );
+    if (matchingUsername) res.status(200).json({ notUnique: true });
+    else res.status(200).json(null);
+  });
+};
+
 const authPage = (req, res) => {
   const state = crypto.randomBytes(16).toString("hex");
   res.cookie("XSRF-TOKEN", state);
@@ -199,6 +209,7 @@ const logout = (req, res) => {
 module.exports = {
   register,
   login,
+  isUniqueUsername,
   authPage,
   getAccessToken,
   getUserDetails,

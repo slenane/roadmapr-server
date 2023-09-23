@@ -3,12 +3,15 @@ const User = require("../models/User.js");
 
 const getSettings = async (req, res) => {
   try {
-    User.findById(req.auth._id, (err, settings) => {
+    User.findById(req.auth._id, (err, user) => {
       res.status(200).json({
-        username: settings.username,
-        email: settings.email,
-        theme: settings.theme,
-        notifications: settings.notifications,
+        userId: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        theme: user.theme,
+        notifications: user.notifications,
+        preferredLanguage: user.preferredLanguage,
       });
     });
   } catch (error) {
@@ -31,10 +34,13 @@ const updateSettings = async (req, res) => {
       { new: true }
     );
     res.status(200).json({
+      userId: settings._id,
+      name: settings.name,
       username: settings.username,
       email: settings.email,
       theme: settings.theme,
       notifications: settings.notifications,
+      preferredLanguage: settings.preferredLanguage,
     });
   } catch (error) {
     res.status(404).json({ message: error.message });

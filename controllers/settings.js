@@ -47,4 +47,27 @@ const updateSettings = async (req, res) => {
   }
 };
 
-module.exports = { getSettings, updateSettings };
+const updatePassword = async (req, res) => {
+  try {
+    User.findById(req.auth._id, async (err, user) => {
+      if (req.body.password) {
+        await user.setPassword(req.body.password);
+        await user.save();
+      }
+
+      res.status(200).json({
+        userId: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        theme: user.theme,
+        notifications: user.notifications,
+        preferredLanguage: user.preferredLanguage,
+      });
+    });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+module.exports = { getSettings, updateSettings, updatePassword };

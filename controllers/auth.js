@@ -83,6 +83,14 @@ const isUniqueUsername = (req, res) => {
   });
 };
 
+const isUniqueEmail = (req, res) => {
+  User.find({}, { email: 1, _id: 0 }, (err, users) => {
+    const matchingEmail = users.find((user) => user.email === req.params.email);
+    if (matchingEmail) res.status(200).json({ notUnique: true });
+    else res.status(200).json(null);
+  });
+};
+
 const authPage = (req, res) => {
   const state = crypto.randomBytes(16).toString("hex");
   res.cookie("XSRF-TOKEN", state);
@@ -210,6 +218,7 @@ module.exports = {
   register,
   login,
   isUniqueUsername,
+  isUniqueEmail,
   authPage,
   getAccessToken,
   getUserDetails,

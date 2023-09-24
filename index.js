@@ -64,7 +64,7 @@ app.use(
 );
 
 // ROUTES
-app.use("/", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/employment", employmentRoutes);
 app.use("/profile", profileRoutes);

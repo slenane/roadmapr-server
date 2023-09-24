@@ -1,5 +1,9 @@
 const express = require("express");
-const { getSettings, updateSettings } = require("../controllers/settings.js");
+const {
+  getSettings,
+  updateSettings,
+  updatePassword,
+} = require("../controllers/settings.js");
 const { expressjwt: jwt } = require("express-jwt");
 
 const isAuth = jwt({
@@ -11,5 +15,6 @@ const router = express.Router();
 
 router.get("", isAuth, getSettings);
 router.patch("/edit/:id", isAuth, updateSettings);
+router.patch("/update-password/:id", isAuth, updatePassword);
 
 module.exports = router;

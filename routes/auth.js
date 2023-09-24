@@ -2,6 +2,8 @@ const express = require("express");
 const {
   register,
   login,
+  isUniqueUsername,
+  isUniqueEmail,
   authPage,
   getAccessToken,
   getUserDetails,
@@ -12,9 +14,11 @@ const router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.get("/auth-page", authPage);
-router.post("/get-access-token", getAccessToken);
-router.get("/get-user-details", getUserDetails);
+router.get("/unique-username/:username", isUniqueUsername);
+router.get("/unique-email/:email", isUniqueEmail);
+router.get("/github/auth-page", authPage);
+router.post("/github/get-access-token", getAccessToken);
+router.get("/github/get-user-details", getUserDetails);
 router.get("/logout", logout);
 
 module.exports = router;

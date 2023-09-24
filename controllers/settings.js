@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 const User = require("../models/User.js");
+const EducationItem = require("../models/education/EducationItem.js");
+const Education = require("../models/education/Education.js");
+const EmploymentItem = require("../models/employment/EmploymentItem.js");
+const Employment = require("../models/employment/Employment.js");
+const ProjectItem = require("../models/projects/ProjectItem.js");
+const Projects = require("../models/projects/Projects.js");
 
 const getSettings = async (req, res) => {
   try {
@@ -70,4 +76,38 @@ const updatePassword = async (req, res) => {
   }
 };
 
-module.exports = { getSettings, updateSettings, updatePassword };
+const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.auth._id;
+
+    // Delete Education
+    const education = await Education.findOne({ user: userId });
+    if (education) {
+      await EducationItem.deleteMany({ education: education._id });
+      await Education.deleteOne({ user: userId });
+    }
+
+    // Delete Employment
+    const employment = await Employment.findOne({ user: userId });
+    if (employment) {
+      await EmploymentItem.deleteMany({ employment: employment._id });
+      await Employment.deleteOne({ user: userId });
+    }
+
+    // Delete Projects
+    const projects = await Projects.findOne({ user: userId });
+    if (projects) {
+      await ProjectItem.deleteMany({ projects: projects._id });
+      await Projects.deleteOne({ user: userId });
+    }
+
+    // Delete User
+    await User.deleteOne({ _id: userId });
+
+    res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getSettings, updateSettings, updatePassword, deleteAccount };

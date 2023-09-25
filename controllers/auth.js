@@ -7,25 +7,44 @@ const Education = require("../models/education/Education.js");
 const Employment = require("../models/employment/Employment.js");
 const Projects = require("../models/projects/Projects.js");
 
+const initialUser = {
+  bio: "",
+  coverImage: "",
+  email: "",
+  github: {
+    id: "",
+    username: "",
+  },
+  interests: {
+    professional_interests: [],
+    personal_interests: [],
+  },
+  languagesSpoken: [],
+  links: {
+    cv: "",
+    portfolio: "",
+    x: "",
+    linkedIn: "",
+  },
+  location: "",
+  name: "",
+  nationality: "",
+  notifications: true,
+  preferredLanguage: "en",
+  previousEducation: [],
+  profileImage: "",
+  role: "",
+  stack: [],
+  theme: "light",
+  username: "",
+};
+
 const register = async (req, res, next) => {
   const user = new User({
+    ...initialUser,
     email: req.body.email,
     username: req.body.username,
     name: req.body.name,
-    coverImage: "",
-    profileImage: "",
-    role: "",
-    bio: "",
-    nationality: "",
-    location: "",
-    languagesSpoken: [],
-    cv: "",
-    skills: [],
-    github: "",
-    twitter: "",
-    linkedIn: "",
-    theme: "light",
-    notifications: true,
   });
 
   await user.setPassword(req.body.password);
@@ -140,36 +159,21 @@ const getUserDetails = (req, res) => {
     })
       .then((githubResponse) => {
         User.findOne(
-          { githubId: githubResponse.data.id },
+          { "github.id": githubResponse.data.id },
           async (err, user) => {
-            console.log(user);
-            if (err) {
-              console.log("HERE");
-              res.send(err);
-            }
+            if (err) throw err;
 
             if (!user) {
-              console.log("!USER");
               User.init();
               user = new User({
-                githubId: githubResponse.data.id,
+                ...initialUser,
+                github: {
+                  id: githubResponse.data.id,
+                  username: githubResponse.data.login,
+                },
                 email: githubResponse.data.email,
                 username: githubResponse.data.login,
                 name: githubResponse.data.name,
-                coverImage: "",
-                profileImage: "",
-                role: "",
-                bio: "",
-                nationality: "",
-                location: "",
-                languagesSpoken: [],
-                cv: "",
-                skills: [],
-                github: githubResponse.data.login,
-                twitter: "",
-                linkedIn: "",
-                theme: "light",
-                notifications: false,
               });
 
               const employment = new Employment({ user: user._id });
@@ -181,18 +185,14 @@ const getUserDetails = (req, res) => {
               user.education = education._id;
 
               try {
-                console.log(user);
-                console.log("NEW USER");
                 await education.save();
                 await employment.save();
                 await projects.save();
                 await user.save();
               } catch (err) {
-                console.log(err);
                 return res.send(err);
               }
             }
-            console.log("GENERATE TOKEN");
 
             const token = user.generateJwt();
             return res.status(200).json({ token, user });

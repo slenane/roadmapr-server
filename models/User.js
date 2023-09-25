@@ -5,28 +5,21 @@ const jwt = require("jsonwebtoken");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+  bio: String,
+  coverImage: String,
   email: {
     type: String,
     unique: true,
     required: true,
   },
-  username: {
-    type: String,
-    unique: true,
-    required: true,
+  github: {
+    id: String,
+    username: String,
   },
-  name: {
-    type: String,
-    required: true,
+  interests: {
+    professional_interests: Array,
+    personal_interests: Array,
   },
-  hash: String,
-  salt: String,
-  coverImage: String,
-  profileImage: String,
-  role: String,
-  bio: String,
-  nationality: String,
-  location: String,
   languagesSpoken: [
     {
       language: String,
@@ -40,10 +33,14 @@ const userSchema = new Schema({
     twitter: String,
     linkedIn: String,
   },
-  interests: {
-    professional_interests: Array,
-    personal_interests: Array,
+  location: String,
+  name: {
+    type: String,
+    required: true,
   },
+  nationality: String,
+  notifications: Boolean,
+  preferredLanguage: "en" | "es" | "pt",
   previousEducation: [
     {
       school: String,
@@ -51,14 +48,20 @@ const userSchema = new Schema({
       level: String,
     },
   ],
+  profileImage: String,
+  role: String,
   stack: Array,
   theme: "light" | "dark",
-  preferredLanguage: "en" | "es" | "pt",
-  notifications: Boolean,
+  username: {
+    type: String,
+    unique: true,
+    required: true,
+  },
   education: String,
   employment: String,
   projects: String,
-  githubId: String,
+  hash: String,
+  salt: String,
 });
 
 userSchema.methods.setPassword = function (password) {

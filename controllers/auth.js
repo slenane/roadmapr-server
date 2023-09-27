@@ -64,9 +64,6 @@ const register = async (req, res, next) => {
     await user.save();
 
     const token = user.generateJwt();
-    // const token = jwt.sign({ id: user._id }, process.env.SECRET, {
-    //   expiresIn: 7200000,
-    // });
     res.status(200).json({ token, user });
   } catch (err) {
     next(err);
@@ -75,18 +72,15 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
-    // If Passport throws/catches an error
     if (err) {
       res.status(404).json(err);
       return;
     }
 
-    // If a user is found
     if (user) {
       const token = user.generateJwt();
       res.status(200).json({ token, user });
     } else {
-      // If user is not found
       res.status(401).json(info);
     }
   })(req, res, next);
@@ -149,6 +143,134 @@ const getAccessToken = (req, res) => {
       res.send(err);
     });
 };
+
+// const getUserDetails = (req, res) => {
+//   console.log("HERE =====>>>>>", req.params.id);
+//   if (req.session.token) {
+//     axios({
+//       url: "https://api.github.com/user",
+//       method: "GET",
+//       headers: { Authorization: "token" + " " + req.session.token },
+//     })
+//       .then((githubAccount) => {
+//         console.log(githubAccount);
+
+//         if (req.params.id) {
+//           User.findOne(
+//             {
+//               _id: req.params.id
+//             },
+//             async (err, user) => {
+//               if (user) {
+
+//                 if (user.github?.id) {
+//                   User.findOne({ "github.id": githubAccount.data.id,}, async (err, githubUser) => {
+//                     if (githubUser) {
+//                       if (githubUser._id !== user._id) {
+//                         res.status(200).json({ message: "This GitHub Account has already been linked to another roadmapr account, please remove it from the other account to continue"})
+//                       }
+//                     }
+//                   })
+//                 } else {
+
+//                 }
+
+//                 if (!user.github?.id) {
+//                   user.github = {
+//                     id: githubAccount.id,
+//                     username: githubAccount.login
+//                   }
+//                 }
+//                 else if (user.github?.id !== githubAccount.id) {
+//                   res
+//                   .status(200)
+//                   .json({
+//                     message:
+//                       "User already exists with that email address. Go to account settings to connect github",
+//                   });
+//                 }
+//                 const token = user.generateJwt();
+//                 return res.status(200).json({ token, user });
+//               }
+//             }
+//           );
+//         } else {
+//           User.findOne(
+//             {
+//               "github.id": githubAccount.data.id,
+//             },
+//             async (err, user) => {
+//               if (user) {
+//                 console.log("NUMBER 1");
+//                 const token = user.generateJwt();
+//                 return res.status(200).json({ token, user });
+//               }
+//             }
+//           );
+
+//           User.findOne(
+//             {
+//               email: githubAccount.data.email,
+//             },
+//             async (err, user) => {
+//               if (user && req.params.id && req.params.id === user._id) {
+//                 console.log("NUMBER 2");
+//                 const token = user.generateJwt();
+//                 return res.status(200).json({ token, user });
+//               } else {
+//                 res
+//                   .status(200)
+//                   .json({
+//                     message:
+//                       "User already exists with that email address. Go to account settings to connect github",
+//                   });
+//               }
+//             }
+//           );
+//         }
+
+//               User.init();
+//               user = new User({
+//                 ...initialUser,
+//                 github: {
+//                   id: githubAccount.data.id,
+//                   username: githubAccount.data.login,
+//                 },
+//                 email: githubAccount.data.email,
+//                 username: githubAccount.data.login,
+//                 name: githubAccount.data.name,
+//               });
+
+//               const employment = new Employment({ user: user._id });
+//               const projects = new Projects({ user: user._id });
+//               const education = new Education({ user: user._id });
+
+//               user.employment = employment._id;
+//               user.projects = projects._id;
+//               user.education = education._id;
+
+//               try {
+//                 await education.save();
+//                 await employment.save();
+//                 await projects.save();
+//                 await user.save();
+//               } catch (err) {
+//                 return res.send(err);
+//               }
+//             }
+
+//             const token = user.generateJwt();
+//             return res.status(200).json({ token, user });
+//           }
+//         );
+//       })
+//       .catch((err) => {
+//         res.send(err);
+//       });
+//   } else {
+//     res.status(401).send();
+//   }
+// };
 
 const getUserDetails = (req, res) => {
   if (req.session.token) {

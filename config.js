@@ -1,4 +1,4 @@
-const dotenv = require("dotenv").config({ path: "./.env" });
+require("dotenv").config({ path: "./.env" });
 
 module.exports = {
   DB_CONNECTION_URL: process.env.DB_CONNECTION_URL,

@@ -27,13 +27,14 @@ const initialUser = {
     linkedIn: "",
   },
   location: "",
-  name: "",
+  firstName: "",
+  lastName: "",
   nationality: "",
   notifications: true,
   preferredLanguage: "en",
   previousEducation: [],
   profileImage: "",
-  role: "",
+  path: "",
   stack: [],
   theme: "light",
   username: "",
@@ -44,7 +45,6 @@ const register = async (req, res, next) => {
     ...initialUser,
     email: req.body.email,
     username: req.body.username,
-    name: req.body.name,
   });
 
   await user.setPassword(req.body.password);
@@ -295,7 +295,7 @@ const getUserDetails = (req, res) => {
                 },
                 email: githubResponse.data.email,
                 username: githubResponse.data.login,
-                name: githubResponse.data.name,
+                // name: githubResponse.data.name, // CHECK WHAT RETURNED VALUE IS AND SPLIT IF NECESSARY
               });
 
               const employment = new Employment({ user: user._id });

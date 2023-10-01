@@ -13,7 +13,8 @@ const getSettings = async (req, res) => {
       res.status(200).json({
         email: user.email,
         github: user.github,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         notifications: user.notifications,
         preferredLanguage: user.preferredLanguage,
         theme: user.theme,
@@ -39,7 +40,8 @@ const updateSettings = async (req, res) => {
     res.status(200).json({
       email: user.email,
       github: user.github,
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       notifications: user.notifications,
       preferredLanguage: user.preferredLanguage,
       theme: user.theme,
@@ -62,7 +64,8 @@ const updatePassword = async (req, res) => {
       res.status(200).json({
         email: user.email,
         github: user.github,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         notifications: user.notifications,
         preferredLanguage: user.preferredLanguage,
         theme: user.theme,

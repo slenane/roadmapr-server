@@ -34,7 +34,11 @@ const userSchema = new Schema({
     linkedIn: String,
   },
   location: String,
-  name: {
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
     type: String,
     required: true,
   },
@@ -49,7 +53,7 @@ const userSchema = new Schema({
     },
   ],
   profileImage: String,
-  role: String,
+  path: String,
   stack: Array,
   theme: "light" | "dark",
   username: {
@@ -86,7 +90,8 @@ userSchema.methods.generateJwt = function () {
     {
       _id: this._id,
       email: this.email,
-      name: this.name,
+      firstName: this.firstName,
+      lastName: this.lastName,
       exp: parseInt(expiry.getTime() / 1000),
     },
     process.env.DB_SECRET

@@ -11,13 +11,14 @@ const getSettings = async (req, res) => {
   try {
     User.findById(req.auth._id, (err, user) => {
       res.status(200).json({
-        userId: user._id,
-        name: user.name,
-        username: user.username,
         email: user.email,
-        theme: user.theme,
+        github: user.github,
+        name: user.name,
         notifications: user.notifications,
         preferredLanguage: user.preferredLanguage,
+        theme: user.theme,
+        userId: user._id,
+        username: user.username,
       });
     });
   } catch (error) {
@@ -34,19 +35,16 @@ const updateSettings = async (req, res) => {
   }
 
   try {
-    const settings = await User.findByIdAndUpdate(
-      id,
-      { ...data },
-      { new: true }
-    );
+    const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
     res.status(200).json({
-      userId: settings._id,
-      name: settings.name,
-      username: settings.username,
-      email: settings.email,
-      theme: settings.theme,
-      notifications: settings.notifications,
-      preferredLanguage: settings.preferredLanguage,
+      email: user.email,
+      github: user.github,
+      name: user.name,
+      notifications: user.notifications,
+      preferredLanguage: user.preferredLanguage,
+      theme: user.theme,
+      userId: user._id,
+      username: user.username,
     });
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -62,13 +60,14 @@ const updatePassword = async (req, res) => {
       }
 
       res.status(200).json({
-        userId: user._id,
-        name: user.name,
-        username: user.username,
         email: user.email,
-        theme: user.theme,
+        github: user.github,
+        name: user.name,
         notifications: user.notifications,
         preferredLanguage: user.preferredLanguage,
+        theme: user.theme,
+        userId: user._id,
+        username: user.username,
       });
     });
   } catch (error) {

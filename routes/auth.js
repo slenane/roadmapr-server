@@ -19,6 +19,7 @@ router.get("/unique-email/:email", isUniqueEmail);
 router.get("/github/auth-page", authPage);
 router.post("/github/get-access-token", getAccessToken);
 router.get("/github/get-user-details", getUserDetails);
+// router.get("/github/get-user-details/:id", getUserDetails);
 router.get("/logout", logout);
 
 module.exports = router;

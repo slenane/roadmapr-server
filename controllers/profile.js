@@ -27,4 +27,17 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile };
+const updateProfileImage = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.auth._id,
+      { profileImage: req.file.location },
+      { new: true }
+    );
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+module.exports = { getProfile, updateProfile, updateProfileImage };

@@ -58,7 +58,7 @@ app.use(
 app.use(
   cookieSession({
     name: "github-session", //name of the cookie containing access token in the //browser
-    secret: "asdfgh",
+    secret: process.env.DB_SECRET,
     httpOnly: true,
   })
 );

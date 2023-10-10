@@ -12,6 +12,8 @@ const userSchema = new Schema({
     unique: true,
     required: true,
   },
+  emailToken: String,
+  isVerified: Boolean,
   github: {
     id: String,
     username: String,

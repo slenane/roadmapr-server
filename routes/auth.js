@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   register,
+  verifyEmail,
   login,
   isUniqueUsername,
   isUniqueEmail,
@@ -13,6 +14,7 @@ const {
 const router = express.Router();
 
 router.post("/register", register);
+router.post("/verify-email", verifyEmail);
 router.post("/login", login);
 router.get("/unique-username/:username", isUniqueUsername);
 router.get("/unique-email/:email", isUniqueEmail);

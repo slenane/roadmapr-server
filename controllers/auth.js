@@ -6,11 +6,17 @@ const User = require("../models/User.js");
 const Education = require("../models/education/Education.js");
 const Employment = require("../models/employment/Employment.js");
 const Projects = require("../models/projects/Projects.js");
+const { getVerificationEmail } = require("../utils/amazonSes");
+
+const AWS = require("aws-sdk");
+AWS.config.update({ region: config.AWS_BUCKET_REGION });
 
 const initialUser = {
   bio: "",
   coverImage: "",
   email: "",
+  emailToken: "",
+  isVerified: false,
   github: {
     id: "",
     username: "",
@@ -36,7 +42,7 @@ const initialUser = {
   profileImage: "",
   path: "",
   stack: [],
-  theme: "light",
+  theme: "dark",
   username: "",
 };
 
@@ -44,6 +50,7 @@ const register = async (req, res, next) => {
   const user = new User({
     ...initialUser,
     email: req.body.email,
+    emailToken: crypto.randomBytes(64).toString("hex"),
     username: req.body.username,
   });
 
@@ -63,11 +70,47 @@ const register = async (req, res, next) => {
     await projects.save();
     await user.save();
 
-    const token = user.generateJwt();
-    res.status(200).json({ token, user });
+    // Create the promise and SES service object
+    const verificationLink = `https://${req.headers.host}/verify-mail?token=${user.emailToken}`;
+    const verificationEmail = getVerificationEmail(
+      req.body.email,
+      verificationLink
+    );
+    const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
+      .sendEmail(verificationEmail)
+      .promise();
+
+    // Handle promise's fulfilled/rejected states
+    sendPromise
+      .then(function (data) {
+        console.log(data.MessageId);
+        res.status(200).json(data.MessageId);
+      })
+      .catch(function (err) {
+        console.error(err, err.stack);
+      });
   } catch (err) {
     next(err);
   }
+};
+
+const verifyEmail = async (req, res) => {
+  try {
+    User.findOne({ emailToken: req.query.token }, async (err, user) => {
+      if (err) throw err;
+
+      user.emailToken = null;
+      user.isVerified = true;
+
+      console.log(user);
+      console.log("VERIFIED");
+
+      await user.save();
+
+      const token = user.generateJwt();
+      res.status(200).json({ token, user });
+    });
+  } catch (error) {}
 };
 
 const login = async (req, res, next) => {
@@ -338,6 +381,7 @@ const logout = (req, res) => {
 
 module.exports = {
   register,
+  verifyEmail,
   login,
   isUniqueUsername,
   isUniqueEmail,

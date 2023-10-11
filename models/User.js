@@ -36,14 +36,8 @@ const userSchema = new Schema({
     linkedIn: String,
   },
   location: String,
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
+  firstName: String,
+  lastName: String,
   nationality: String,
   notifications: Boolean,
   preferredLanguage: "en" | "es" | "pt",

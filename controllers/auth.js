@@ -71,7 +71,7 @@ const register = async (req, res, next) => {
     await user.save();
 
     // Create the promise and SES service object
-    const verificationLink = `https://${req.headers.host}/verify-mail?token=${user.emailToken}`;
+    const verificationLink = `http://${req.headers.host}/auth/verify-email?token=${user.emailToken}`;
     const verificationEmail = getVerificationEmail(
       req.body.email,
       verificationLink
@@ -83,11 +83,10 @@ const register = async (req, res, next) => {
     // Handle promise's fulfilled/rejected states
     sendPromise
       .then(function (data) {
-        console.log(data.MessageId);
-        res.status(200).json(data.MessageId);
+        res.status(200).json({ messageSuccess: data.MessageId });
       })
       .catch(function (err) {
-        console.error(err, err.stack);
+        res.status(400).json({ err });
       });
   } catch (err) {
     next(err);
@@ -101,14 +100,9 @@ const verifyEmail = async (req, res) => {
 
       user.emailToken = null;
       user.isVerified = true;
-
-      console.log(user);
-      console.log("VERIFIED");
-
       await user.save();
 
-      const token = user.generateJwt();
-      res.status(200).json({ token, user });
+      res.redirect("http://localhost:4200/login?verified=true");
     });
   } catch (error) {}
 };

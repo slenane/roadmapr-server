@@ -12,6 +12,8 @@ const userSchema = new Schema({
     unique: true,
     required: true,
   },
+  emailToken: String,
+  isVerified: Boolean,
   github: {
     id: String,
     username: String,
@@ -34,14 +36,8 @@ const userSchema = new Schema({
     linkedIn: String,
   },
   location: String,
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
+  firstName: String,
+  lastName: String,
   nationality: String,
   notifications: Boolean,
   preferredLanguage: "en" | "es" | "pt",

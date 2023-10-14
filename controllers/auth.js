@@ -187,82 +187,86 @@ const getGithubUser = (req, res) => {
       url: "https://api.github.com/user",
       method: "GET",
       headers: { Authorization: "token" + " " + req.session.token },
-    }).then((githubAccount) => {
-      const userId = req.params.id;
+    })
+      .then((githubAccount) => {
+        const userId = req.params.id;
+        // Existing user adding github
+        if (userId) {
+          User.findOne(
+            { "github.id": githubAccount.data.id },
+            async (err, githubUser) => {
+              if (err) throw err;
 
-      // Existing user adding github
-      if (userId) {
-        User.findOne(
-          { "github.id": githubAccount.data.id },
-          async (err, githubUser) => {
-            if (err) throw err;
+              if (githubUser) {
+                return res.status(400).json({
+                  message:
+                    "This GitHub Account has already been linked to another roadmapr account, please unlink the other account to continue",
+                });
+              } else {
+                User.findOne({ _id: userId }, async (err, user) => {
+                  if (err) throw err;
 
-            if (githubUser) {
-              return res.status(400).json({
-                message:
-                  "This GitHub Account has already been linked to another roadmapr account, please unlink the other account to continue",
-              });
-            } else {
-              User.findOne({ _id: userId }, async (err, user) => {
-                if (err) throw err;
+                  user.github = {
+                    id: githubAccount.data.id,
+                    username: githubAccount.data.login,
+                  };
 
-                user.github = {
-                  id: githubAccount.data.id,
-                  username: githubAccount.data.login,
-                };
+                  user.save();
 
-                user.save();
-
-                const token = user.generateJwt();
-                return res.status(200).json({ token, user });
-              });
-            }
-          }
-        );
-      } else {
-        User.findOne(
-          { "github.id": githubAccount.data.id },
-          async (err, user) => {
-            if (err) throw err;
-
-            if (!user) {
-              User.init();
-              user = new User({
-                ...initialUser,
-                github: {
-                  id: githubResponse.data.id,
-                  username: githubResponse.data.login,
-                },
-                email: githubResponse.data.email,
-                username: githubResponse.data.login,
-              });
-
-              const employment = new Employment({ user: user._id });
-              const projects = new Projects({ user: user._id });
-              const education = new Education({ user: user._id });
-
-              user.employment = employment._id;
-              user.projects = projects._id;
-              user.education = education._id;
-
-              try {
-                await education.save();
-                await employment.save();
-                await projects.save();
-                await user.save();
-              } catch (err) {
-                return res.send(err);
+                  return res.status(200).json({ user });
+                });
               }
             }
+          );
+        } else {
+          User.findOne(
+            { "github.id": githubAccount.data.id },
+            async (err, user) => {
+              if (err) {
+                console.log(err);
+                throw err;
+              }
 
-            const token = user.generateJwt();
-            return res.status(200).json({ token, user });
-          }
-        ).catch((err) => {
-          res.send(err);
-        });
-      }
-    });
+              if (!user) {
+                User.init();
+                user = new User({
+                  ...initialUser,
+                  github: {
+                    id: githubResponse.data.id,
+                    username: githubResponse.data.login,
+                  },
+                  email: githubResponse.data.email,
+                  username: githubResponse.data.login,
+                });
+
+                const employment = new Employment({ user: user._id });
+                const projects = new Projects({ user: user._id });
+                const education = new Education({ user: user._id });
+
+                user.employment = employment._id;
+                user.projects = projects._id;
+                user.education = education._id;
+
+                try {
+                  await education.save();
+                  await employment.save();
+                  await projects.save();
+                  await user.save();
+                } catch (err) {
+                  return res.status(404).json({ err });
+                }
+              }
+
+              const token = user.generateJwt();
+              console.log(token, user);
+              return res.status(200).json({ token, user });
+            }
+          );
+        }
+      })
+      .catch((err) => {
+        res.status(404).json({ err });
+      });
   } else {
     res.status(401).send();
   }

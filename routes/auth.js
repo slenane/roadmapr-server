@@ -8,6 +8,7 @@ const {
   authPage,
   getAccessToken,
   getGithubUser,
+  updateGithubExistingUser,
   logout,
 } = require("../controllers/auth.js");
 
@@ -21,6 +22,7 @@ router.get("/unique-email/:email", isUniqueEmail);
 router.get("/github/auth-page", authPage);
 router.post("/github/get-access-token", getAccessToken);
 router.get("/github/get-user-details", getGithubUser);
+router.get("/github/update-existing-user/:id", updateGithubExistingUser);
 router.get("/logout", logout);
 
 module.exports = router;

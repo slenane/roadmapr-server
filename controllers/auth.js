@@ -188,16 +188,71 @@ const getGithubUser = (req, res) => {
       method: "GET",
       headers: { Authorization: "token" + " " + req.session.token },
     })
-      .then((githubAccount) => {
+      .then((githubUser) => {
+        User.findOne({ "github.id": githubUser.data.id }, async (err, user) => {
+          if (err) {
+            console.log(err);
+            throw err;
+          }
+
+          if (!user) {
+            User.init();
+            user = new User({
+              ...initialUser,
+              github: {
+                id: githubUser.data.id,
+                username: githubUser.data.login,
+              },
+              email: githubUser.data.email, // If email is already used do something
+              username: githubUser.data.login, // If username already used then add numbers to end
+            });
+
+            const employment = new Employment({ user: user._id });
+            const projects = new Projects({ user: user._id });
+            const education = new Education({ user: user._id });
+
+            user.employment = employment._id;
+            user.projects = projects._id;
+            user.education = education._id;
+
+            try {
+              await education.save();
+              await employment.save();
+              await projects.save();
+              await user.save();
+            } catch (err) {
+              return res.status(404).json({ err });
+            }
+          }
+
+          const token = user.generateJwt();
+          return res.status(200).json({ token, user });
+        });
+      })
+      .catch((err) => {
+        res.status(404).json({ err });
+      });
+  } else {
+    res.status(401).send();
+  }
+};
+
+const updateGithubExistingUser = (req, res) => {
+  if (req.session.token) {
+    axios({
+      url: "https://api.github.com/user",
+      method: "GET",
+      headers: { Authorization: "token" + " " + req.session.token },
+    })
+      .then((githubUser) => {
         const userId = req.params.id;
-        // Existing user adding github
         if (userId) {
           User.findOne(
-            { "github.id": githubAccount.data.id },
-            async (err, githubUser) => {
+            { "github.id": githubUser.data.id },
+            async (err, user) => {
               if (err) throw err;
 
-              if (githubUser) {
+              if (user) {
                 return res.status(400).json({
                   message:
                     "This GitHub Account has already been linked to another roadmapr account, please unlink the other account to continue",
@@ -207,8 +262,8 @@ const getGithubUser = (req, res) => {
                   if (err) throw err;
 
                   user.github = {
-                    id: githubAccount.data.id,
-                    username: githubAccount.data.login,
+                    id: githubUser.data.id,
+                    username: githubUser.data.login,
                   };
 
                   user.save();
@@ -216,50 +271,6 @@ const getGithubUser = (req, res) => {
                   return res.status(200).json({ user });
                 });
               }
-            }
-          );
-        } else {
-          User.findOne(
-            { "github.id": githubAccount.data.id },
-            async (err, user) => {
-              if (err) {
-                console.log(err);
-                throw err;
-              }
-
-              if (!user) {
-                User.init();
-                user = new User({
-                  ...initialUser,
-                  github: {
-                    id: githubResponse.data.id,
-                    username: githubResponse.data.login,
-                  },
-                  email: githubResponse.data.email,
-                  username: githubResponse.data.login,
-                });
-
-                const employment = new Employment({ user: user._id });
-                const projects = new Projects({ user: user._id });
-                const education = new Education({ user: user._id });
-
-                user.employment = employment._id;
-                user.projects = projects._id;
-                user.education = education._id;
-
-                try {
-                  await education.save();
-                  await employment.save();
-                  await projects.save();
-                  await user.save();
-                } catch (err) {
-                  return res.status(404).json({ err });
-                }
-              }
-
-              const token = user.generateJwt();
-              console.log(token, user);
-              return res.status(200).json({ token, user });
             }
           );
         }
@@ -288,5 +299,6 @@ module.exports = {
   authPage,
   getAccessToken,
   getGithubUser,
+  updateGithubExistingUser,
   logout,
 };

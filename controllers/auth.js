@@ -191,42 +191,76 @@ const getGithubUser = (req, res) => {
       .then((githubUser) => {
         User.findOne({ "github.id": githubUser.data.id }, async (err, user) => {
           if (err) {
-            console.log(err);
             throw err;
           }
 
-          if (!user) {
-            User.init();
-            user = new User({
-              ...initialUser,
-              github: {
-                id: githubUser.data.id,
-                username: githubUser.data.login,
-              },
-              email: githubUser.data.email, // If email is already used do something
-              username: githubUser.data.login, // If username already used then add numbers to end
-            });
-
-            const employment = new Employment({ user: user._id });
-            const projects = new Projects({ user: user._id });
-            const education = new Education({ user: user._id });
-
-            user.employment = employment._id;
-            user.projects = projects._id;
-            user.education = education._id;
-
-            try {
-              await education.save();
-              await employment.save();
-              await projects.save();
-              await user.save();
-            } catch (err) {
-              return res.status(404).json({ err });
-            }
+          if (user) {
+            const token = user.generateJwt();
+            return res.status(200).json({ token, user });
           }
 
-          const token = user.generateJwt();
-          return res.status(200).json({ token, user });
+          User.findOne(
+            { email: githubUser.data.email },
+            async (err, existingUser) => {
+              if (err) {
+                throw err;
+              }
+
+              if (existingUser) {
+                user.github = {
+                  id: githubUser.data.id,
+                  username: githubUser.data.login,
+                };
+
+                await user.save();
+                const token = user.generateJwt();
+                return res.status(200).json({ token, user });
+              }
+
+              User.findOne(
+                { username: githubUser.data.login },
+                async (err, existingUsername) => {
+                  if (err) {
+                    throw err;
+                  }
+
+                  User.init();
+                  user = new User({
+                    ...initialUser,
+                    github: {
+                      id: githubUser.data.id,
+                      username: githubUser.data.login,
+                    },
+                    email: githubUser.data.email,
+                    username: existingUsername
+                      ? githubUser.data.login +
+                        (Math.floor(Math.random() * 90000) + 10000)
+                      : githubUser.data.login,
+                  });
+
+                  const employment = new Employment({ user: user._id });
+                  const projects = new Projects({ user: user._id });
+                  const education = new Education({ user: user._id });
+
+                  user.employment = employment._id;
+                  user.projects = projects._id;
+                  user.education = education._id;
+
+                  try {
+                    await education.save();
+                    await employment.save();
+                    await projects.save();
+                    await user.save();
+
+                    const token = user.generateJwt();
+                    return res.status(200).json({ token, user });
+                  } catch (err) {
+                    return res.status(404).json({ err });
+                  }
+                }
+              );
+            }
+          );
         });
       })
       .catch((err) => {
@@ -266,7 +300,7 @@ const updateGithubExistingUser = (req, res) => {
                     username: githubUser.data.login,
                   };
 
-                  user.save();
+                  await user.save();
 
                   return res.status(200).json({ user });
                 });

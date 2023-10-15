@@ -11,7 +11,7 @@ const getDashboard = async (req, res, next) => {
     const user = await User.findById(id).exec();
 
     if (!user) {
-      throw new Http404Error(`User not found`);
+      throw new Http404Error("User not found");
     }
 
     const education = await Education.findById(user.education)

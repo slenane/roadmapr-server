@@ -1,42 +1,66 @@
 const mongoose = require("mongoose");
 const User = require("../models/User.js");
+const Http404Error = require("../utils/errorHandling/http404Error.js");
+const Http400Error = require("../utils/errorHandling/http400Error.js");
 
-const getProfile = async (req, res) => {
+const getProfile = async (req, res, next) => {
   try {
-    User.findById(req.auth._id, (err, user) => {
-      res.status(200).json(user);
-    });
+    const user = await User.findById(req.auth._id);
+
+    if (!user) {
+      throw new Http404Error("User not found");
+    }
+
+    res.status(200).json(user);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
   }
 };
 
-const updateProfile = async (req, res) => {
-  let data = req.body.data;
+const updateProfile = async (req, res, next) => {
+  if (!req.body.data) {
+    throw new Http400Error("No information was provided");
+  }
+
+  const data = req.body.data;
   const id = req.params.id;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).send("No item with that id");
+    throw new Http404Error("User not found");
   }
 
   try {
     const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
+
+    if (!user) {
+      throw new Http404Error("User not found");
+    }
+
     res.status(200).json(user);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
   }
 };
 
-const updateProfileImage = async (req, res) => {
+const updateProfileImage = async (req, res, next) => {
+  if (!req.file) {
+    throw new Http400Error("No file was provided");
+  }
+
   try {
     const user = await User.findByIdAndUpdate(
       req.auth._id,
       { profileImage: req.file.location },
       { new: true }
     );
+
+    if (!user) {
+      throw new Http404Error("User not found");
+    }
+
     res.status(200).json(user);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
   }
 };
 

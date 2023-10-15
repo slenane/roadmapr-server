@@ -11,44 +11,45 @@ const { getVerificationEmail } = require("../utils/amazonSes");
 const AWS = require("aws-sdk");
 AWS.config.update({ region: config.AWS_BUCKET_REGION });
 
-const initialUser = {
-  bio: "",
-  coverImage: "",
-  email: "",
-  emailToken: "",
-  isVerified: false,
-  github: {
-    id: "",
-    username: "",
-  },
-  interests: {
-    professional_interests: [],
-    personal_interests: [],
-  },
-  languagesSpoken: [],
-  links: {
-    cv: "",
-    portfolio: "",
-    x: "",
-    linkedIn: "",
-  },
-  location: "",
-  firstName: "",
-  lastName: "",
-  nationality: "",
-  notifications: true,
-  preferredLanguage: "en",
-  previousEducation: [],
-  profileImage: "",
-  path: "",
-  stack: [],
-  theme: "dark",
-  username: "",
-};
+// const initialUser = {
+//   bio: "",
+//   coverImage: "",
+//   email: "",
+//   emailToken: "",
+//   isVerified: false,
+//   github: {
+//     id: "",
+//     username: "",
+//   },
+//   interests: {
+//     professional_interests: [],
+//     personal_interests: [],
+//   },
+//   languagesSpoken: [],
+//   links: {
+//     cv: "",
+//     portfolio: "",
+//     x: "",
+//     linkedIn: "",
+//   },
+//   location: "",
+//   firstName: "",
+//   lastName: "",
+//   nationality: "",
+//   notifications: true,
+//   preferredLanguage: "en",
+//   previousEducation: [],
+//   profileImage: "",
+//   path: "",
+//   stack: [],
+//   theme: "dark",
+//   username: "",
+// };
 
 const register = async (req, res, next) => {
   const user = new User({
-    ...initialUser,
+    preferredLanguage: "en",
+    theme: "dark",
     email: req.body.email,
     emailToken: crypto.randomBytes(64).toString("hex"),
     username: req.body.username,
@@ -82,10 +83,10 @@ const register = async (req, res, next) => {
 
     // Handle promise's fulfilled/rejected states
     sendPromise
-      .then(function (data) {
+      .then((data) => {
         res.status(200).json({ messageSuccess: data.MessageId });
       })
-      .catch(function (err) {
+      .catch((err) => {
         res.status(400).json({ err });
       });
   } catch (err) {
@@ -226,7 +227,8 @@ const getGithubUser = (req, res) => {
 
                   User.init();
                   user = new User({
-                    ...initialUser,
+                    preferredLanguage: "en",
+                    theme: "dark",
                     github: {
                       id: githubUser.data.id,
                       username: githubUser.data.login,

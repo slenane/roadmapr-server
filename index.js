@@ -64,13 +64,13 @@ app.use(
 );
 
 // ROUTES
-app.use("/auth", authRoutes);
-app.use("/dashboard", dashboardRoutes);
-app.use("/employment", employmentRoutes);
-app.use("/profile", profileRoutes);
-app.use("/education", educationRoutes);
-app.use("/projects", projectsRoutes);
-app.use("/settings", settingsRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/employment", employmentRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/education", educationRoutes);
+app.use("/api/projects", projectsRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // ERROR HANDLERS
 app.use(function (err, req, res, next) {

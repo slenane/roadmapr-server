@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Education = require("../models/education/Education.js");
 const EducationItem = require("../models/education/EducationItem.js");
 const Http404Error = require("../utils/errorHandling/http404Error");
+const Http400Error = require("../utils/errorHandling/http400Error.js");
 // const fetchEducationItem = require("../utils/fetchEducationItem.js");
 
 const getEducation = async (req, res, next) => {
@@ -22,7 +23,9 @@ const getEducation = async (req, res, next) => {
 };
 
 const createEducationItem = async (req, res, next) => {
-  if (!req.body.data) return;
+  if (!req.body.data) {
+    throw new Http400Error("No information was provided");
+  }
 
   const educationItem = new EducationItem({
     ...req.body.data,
@@ -32,7 +35,7 @@ const createEducationItem = async (req, res, next) => {
   try {
     await educationItem.save();
 
-    const education = Education.findById(educationItem.education)
+    const education = await Education.findById(educationItem.education)
       .populate("educationList")
       .exec();
 
@@ -50,7 +53,9 @@ const createEducationItem = async (req, res, next) => {
 };
 
 const updateEducationItem = async (req, res, next) => {
-  if (!req.body.data) return;
+  if (!req.body.data) {
+    throw new Http400Error("No information was provided");
+  }
 
   const educationItem = req.body.data;
   const id = req.body.data._id;
@@ -66,7 +71,7 @@ const updateEducationItem = async (req, res, next) => {
   );
 
   try {
-    const education = Education.findById(req.params.id)
+    const education = await Education.findById(educationItem.education)
       .populate("educationList")
       .exec();
 
@@ -81,7 +86,9 @@ const updateEducationItem = async (req, res, next) => {
 };
 
 const bulkUpdateEducationItems = async (req, res, next) => {
-  if (!req.body.data) return;
+  if (!req.body.data) {
+    throw new Http400Error("No information was provided");
+  }
 
   const educationItems = req.body.data;
 
@@ -96,7 +103,7 @@ const bulkUpdateEducationItems = async (req, res, next) => {
   });
 
   try {
-    const education = Education.findById(req.params.id)
+    const education = await Education.findById(req.params.id)
       .populate("educationList")
       .exec();
 
@@ -111,7 +118,9 @@ const bulkUpdateEducationItems = async (req, res, next) => {
 };
 
 const deleteEducationItem = async (req, res, next) => {
-  if (!req.body.data) return;
+  if (!req.body.data) {
+    throw new Http400Error("No information was provided");
+  }
 
   let educationItem = req.body.data;
   let educationId = educationItem.education;
@@ -124,7 +133,7 @@ const deleteEducationItem = async (req, res, next) => {
   await EducationItem.findByIdAndRemove(educationItem._id);
 
   try {
-    const education = Education.findById(educationId)
+    const education = await Education.findById(educationId)
       .populate("educationList")
       .exec();
 

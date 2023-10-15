@@ -1,15 +1,15 @@
 const httpStatusCodes = require("./httpStatusCodes");
 const BaseError = require("./baseError");
 
-class Http404Error extends BaseError {
+class Http400Error extends BaseError {
   constructor(
     message,
-    statusCode = httpStatusCodes.NOT_FOUND,
-    description = "Not Found",
+    statusCode = httpStatusCodes.BAD_REQUEST,
+    description = "Bad Request",
     isOperational = true
   ) {
     super(message, statusCode, isOperational, description);
   }
 }
 
-module.exports = Http404Error;
+module.exports = Http400Error;

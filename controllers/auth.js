@@ -7,10 +7,12 @@ const Education = require("../models/education/Education.js");
 const Employment = require("../models/employment/Employment.js");
 const Projects = require("../models/projects/Projects.js");
 const { getVerificationEmail } = require("../utils/amazonSes");
-
 const AWS = require("aws-sdk");
 AWS.config.update({ region: config.AWS_BUCKET_REGION });
-
+const Http400Error = require("../utils/errorHandling/http400Error");
+const Http404Error = require("../utils/errorHandling/http404Error");
+const validPasswordRegex =
+  /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,20}$/;
 // const initialUser = {
 //   bio: "",
 //   coverImage: "",
@@ -47,25 +49,41 @@ AWS.config.update({ region: config.AWS_BUCKET_REGION });
 // };
 
 const register = async (req, res, next) => {
-  const user = new User({
-    preferredLanguage: "en",
-    theme: "dark",
-    email: req.body.email,
-    emailToken: crypto.randomBytes(64).toString("hex"),
-    username: req.body.username,
-  });
-
-  await user.setPassword(req.body.password);
-
-  const employment = new Employment({ user: user._id });
-  const projects = new Projects({ user: user._id });
-  const education = new Education({ user: user._id });
-
-  user.employment = employment._id;
-  user.projects = projects._id;
-  user.education = education._id;
-
   try {
+    if (await User.exists({ username: req.body.username })) {
+      throw new Http400Error(
+        "Username already in use, please try something else"
+      );
+    }
+    if (await User.exists({ email: req.body.email })) {
+      throw new Http400Error(
+        "Email already in use, please log in or try a different email"
+      );
+    }
+    if (!validPasswordRegex.test(req.body.password)) {
+      throw new Http400Error(
+        "Password invalid: Passwords must be at least 6 characters long, contains at least 1 number and 1 special character (!@#$%^&*)"
+      );
+    }
+
+    const user = new User({
+      preferredLanguage: "en",
+      theme: "dark",
+      email: req.body.email,
+      emailToken: crypto.randomBytes(64).toString("hex"),
+      username: req.body.username,
+    });
+
+    await user.setPassword(req.body.password);
+
+    const employment = new Employment({ user: user._id });
+    const projects = new Projects({ user: user._id });
+    const education = new Education({ user: user._id });
+
+    user.employment = employment._id;
+    user.projects = projects._id;
+    user.education = education._id;
+
     await education.save();
     await employment.save();
     await projects.save();
@@ -86,26 +104,30 @@ const register = async (req, res, next) => {
       .then((data) => {
         res.status(200).json({ messageSuccess: data.MessageId });
       })
-      .catch((err) => {
-        res.status(400).json({ err });
+      .catch((error) => {
+        next(error);
       });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
 const verifyEmail = async (req, res) => {
   try {
-    User.findOne({ emailToken: req.query.token }, async (err, user) => {
-      if (err) throw err;
+    const user = await User.findOne({ emailToken: req.query.token });
 
-      user.emailToken = null;
-      user.isVerified = true;
-      await user.save();
+    if (!user) {
+      throw new Http404Error("User not found");
+    }
 
-      res.redirect("http://localhost:4200/login?verified=true");
-    });
-  } catch (error) {}
+    user.emailToken = null;
+    user.isVerified = true;
+    await user.save();
+
+    res.redirect("http://localhost:4200/login?verified=true");
+  } catch (error) {
+    next(error);
+  }
 };
 
 const login = async (req, res, next) => {
@@ -124,22 +146,34 @@ const login = async (req, res, next) => {
   })(req, res, next);
 };
 
-const isUniqueUsername = (req, res) => {
-  User.find({}, { username: 1, _id: 0 }, (err, users) => {
-    const matchingUsername = users.find(
-      (user) => user.username === req.params.username
-    );
-    if (matchingUsername) res.status(200).json({ notUnique: true });
+const isUniqueUsername = async (req, res, next) => {
+  try {
+    if (!req.params.username) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const user = await User.exists({ username: req.params.username });
+
+    if (user) res.status(200).json({ notUnique: true });
     else res.status(200).json(null);
-  });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const isUniqueEmail = (req, res) => {
-  User.find({}, { email: 1, _id: 0 }, (err, users) => {
-    const matchingEmail = users.find((user) => user.email === req.params.email);
-    if (matchingEmail) res.status(200).json({ notUnique: true });
+const isUniqueEmail = async (req, res, next) => {
+  try {
+    if (!req.params.email) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const user = await User.exists({ email: req.params.email });
+
+    if (user) res.status(200).json({ notUnique: true });
     else res.status(200).json(null);
-  });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const authPage = (req, res) => {

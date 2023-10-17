@@ -11,49 +11,31 @@ const AWS = require("aws-sdk");
 AWS.config.update({ region: config.AWS_BUCKET_REGION });
 const Http400Error = require("../utils/errorHandling/http400Error");
 const Http404Error = require("../utils/errorHandling/http404Error");
+const Http500Error = require("../utils/errorHandling/http500Error");
 const validPasswordRegex =
   /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,20}$/;
-// const initialUser = {
-//   bio: "",
-//   coverImage: "",
-//   email: "",
-//   emailToken: "",
-//   isVerified: false,
-//   github: {
-//     id: "",
-//     username: "",
-//   },
-//   interests: {
-//     professional_interests: [],
-//     personal_interests: [],
-//   },
-//   languagesSpoken: [],
-//   links: {
-//     cv: "",
-//     portfolio: "",
-//     x: "",
-//     linkedIn: "",
-//   },
-//   location: "",
-//   firstName: "",
-//   lastName: "",
-//   nationality: "",
-//   notifications: true,
-//   preferredLanguage: "en",
-//   previousEducation: [],
-//   profileImage: "",
-//   path: "",
-//   stack: [],
-//   theme: "dark",
-//   username: "",
-// };
+const emailRegex = /^\S+@\S+\.\S+$/;
 
 const register = async (req, res, next) => {
   try {
+    if (!req.body) {
+      throw new Http400Error("No information was provided");
+    }
+    if (!req.body.username || !req.body.email || !req.body.password) {
+      throw new Http400Error(
+        "Required information missing, please check all required fields have been filled"
+      );
+    }
+    if (req.body.username.length < 2) {
+      throw new Http400Error("Username must be of minimum length 2 characters");
+    }
     if (await User.exists({ username: req.body.username })) {
       throw new Http400Error(
         "Username already in use, please try something else"
       );
+    }
+    if (!emailRegex.test(req.body.email)) {
+      throw new Http400Error("Email is not valid");
     }
     if (await User.exists({ email: req.body.email })) {
       throw new Http400Error(
@@ -130,18 +112,21 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-const login = async (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) {
-      res.status(404).json(err);
-      return;
-    }
+const login = (req, res, next) => {
+  passport.authenticate("local", (err, user) => {
+    try {
+      if (err) {
+        throw new Http500Error(err.message);
+      }
 
-    if (user) {
+      if (!user) {
+        throw new Http404Error("Invalid Username or Password");
+      }
+
       const token = user.generateJwt();
       res.status(200).json({ token, user });
-    } else {
-      res.status(401).json(info);
+    } catch (error) {
+      next(error);
     }
   })(req, res, next);
 };
@@ -176,180 +161,189 @@ const isUniqueEmail = async (req, res, next) => {
   }
 };
 
-const authPage = (req, res) => {
-  const state = crypto.randomBytes(16).toString("hex");
-  res.cookie("XSRF-TOKEN", state);
-  res.send({
-    authUrl:
-      "https://github.com/login/oauth/authorize?client_id=" +
-      config.GITHUB_CLIENT_ID +
-      "&scope=read:user&allow_signup=" +
-      true +
-      "&state=" +
-      state,
-  });
-};
-
-const getAccessToken = (req, res) => {
-  const state = req.headers["x-xsrf-token"];
-  axios({
-    url:
-      "https://github.com/login/oauth/access_token?client_id=" +
-      config.GITHUB_CLIENT_ID +
-      "&client_secret=" +
-      config.GITHUB_CLIENT_SECRET +
-      "&code=" +
-      req.body.code +
-      "&state=" +
-      state,
-    method: "POST",
-    headers: { Accept: "application/json" },
-  })
-    .then((resp) => {
-      if (resp.data.access_token) {
-        req.session.token = resp.data.access_token;
-      }
-      res.send(resp.data);
-    })
-    .catch((err) => {
-      res.send(err);
+const authPage = (req, res, next) => {
+  try {
+    const state = crypto.randomBytes(16).toString("hex");
+    res.cookie("XSRF-TOKEN", state);
+    res.status(200).send({
+      authUrl:
+        "https://github.com/login/oauth/authorize?client_id=" +
+        config.GITHUB_CLIENT_ID +
+        "&scope=read:user&allow_signup=" +
+        true +
+        "&state=" +
+        state,
     });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const getGithubUser = (req, res) => {
-  if (req.session.token) {
+const getAccessToken = (req, res, next) => {
+  try {
+    const state = req.headers["x-xsrf-token"];
+    axios({
+      url:
+        "https://github.com/login/oauth/access_token?client_id=" +
+        config.GITHUB_CLIENT_ID +
+        "&client_secret=" +
+        config.GITHUB_CLIENT_SECRET +
+        "&code=" +
+        req.body.code +
+        "&state=" +
+        state,
+      method: "POST",
+      headers: { Accept: "application/json" },
+    })
+      .then((resp) => {
+        if (resp.data.access_token) {
+          req.session.token = resp.data.access_token;
+        }
+        res.status(200).send(resp.data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getGithubUser = async (req, res, next) => {
+  try {
+    if (!req.session.token) {
+      throw new Http500Error("Token not provided, please try again");
+    }
+
     axios({
       url: "https://api.github.com/user",
       method: "GET",
       headers: { Authorization: "token" + " " + req.session.token },
     })
-      .then((githubUser) => {
-        User.findOne({ "github.id": githubUser.data.id }, async (err, user) => {
-          if (err) {
-            throw err;
+      .then(async (githubUser) => {
+        try {
+          const existingGithubOAuthUser = await User.findOne({
+            "github.id": githubUser.data.id,
+          });
+
+          if (existingGithubOAuthUser) {
+            const token = existingGithubOAuthUser.generateJwt();
+            return res
+              .status(200)
+              .json({ token, user: existingGithubOAuthUser });
           }
 
-          if (user) {
-            const token = user.generateJwt();
-            return res.status(200).json({ token, user });
+          const existingUserMatchingEmail = await User.findOne({
+            email: githubUser.data.email,
+          });
+
+          if (existingUserMatchingEmail) {
+            existingUserMatchingEmail.github = {
+              id: githubUser.data.id,
+              username: githubUser.data.login,
+            };
+
+            await existingUserMatchingEmail.save();
+            const token = existingUserMatchingEmail.generateJwt();
+            return res
+              .status(200)
+              .json({ token, user: existingUserMatchingEmail });
           }
 
-          User.findOne(
-            { email: githubUser.data.email },
-            async (err, existingUser) => {
-              if (err) {
-                throw err;
-              }
+          const existingUserMatchingUsername = await User.findOne({
+            username: githubUser.data.login,
+          });
 
-              if (existingUser) {
-                user.github = {
-                  id: githubUser.data.id,
-                  username: githubUser.data.login,
-                };
+          User.init();
+          user = new User({
+            preferredLanguage: "en",
+            theme: "dark",
+            github: {
+              id: githubUser.data.id,
+              username: githubUser.data.login,
+            },
+            email: githubUser.data.email,
+            username: existingUserMatchingUsername
+              ? githubUser.data.login +
+                (Math.floor(Math.random() * 90000) + 10000)
+              : githubUser.data.login,
+          });
 
-                await user.save();
-                const token = user.generateJwt();
-                return res.status(200).json({ token, user });
-              }
+          const employment = new Employment({ user: user._id });
+          const projects = new Projects({ user: user._id });
+          const education = new Education({ user: user._id });
 
-              User.findOne(
-                { username: githubUser.data.login },
-                async (err, existingUsername) => {
-                  if (err) {
-                    throw err;
-                  }
+          user.employment = employment._id;
+          user.projects = projects._id;
+          user.education = education._id;
 
-                  User.init();
-                  user = new User({
-                    preferredLanguage: "en",
-                    theme: "dark",
-                    github: {
-                      id: githubUser.data.id,
-                      username: githubUser.data.login,
-                    },
-                    email: githubUser.data.email,
-                    username: existingUsername
-                      ? githubUser.data.login +
-                        (Math.floor(Math.random() * 90000) + 10000)
-                      : githubUser.data.login,
-                  });
+          await education.save();
+          await employment.save();
+          await projects.save();
+          await user.save();
 
-                  const employment = new Employment({ user: user._id });
-                  const projects = new Projects({ user: user._id });
-                  const education = new Education({ user: user._id });
-
-                  user.employment = employment._id;
-                  user.projects = projects._id;
-                  user.education = education._id;
-
-                  try {
-                    await education.save();
-                    await employment.save();
-                    await projects.save();
-                    await user.save();
-
-                    const token = user.generateJwt();
-                    return res.status(200).json({ token, user });
-                  } catch (err) {
-                    return res.status(404).json({ err });
-                  }
-                }
-              );
-            }
-          );
-        });
+          const token = user.generateJwt();
+          return res.status(200).json({ token, user });
+        } catch (error) {
+          next(error);
+        }
       })
-      .catch((err) => {
-        res.status(404).json({ err });
+      .catch((error) => {
+        next(error);
       });
-  } else {
-    res.status(401).send();
+  } catch (error) {
+    next(error);
   }
 };
 
 const updateGithubExistingUser = (req, res) => {
-  if (req.session.token) {
+  try {
+    if (!req.session.token) {
+      throw new Http500Error("Token not provided, please try again");
+    }
+    if (!req.params.id) {
+      throw new Http404Error("User not found");
+    }
+
     axios({
       url: "https://api.github.com/user",
       method: "GET",
       headers: { Authorization: "token" + " " + req.session.token },
     })
-      .then((githubUser) => {
-        const userId = req.params.id;
-        if (userId) {
-          User.findOne(
-            { "github.id": githubUser.data.id },
-            async (err, user) => {
-              if (err) throw err;
+      .then(async (githubUser) => {
+        try {
+          const existingUserWithThisGithub = await User.findOne({
+            "github.id": githubUser.data.id,
+          });
 
-              if (user) {
-                return res.status(400).json({
-                  message:
-                    "This GitHub Account has already been linked to another roadmapr account, please unlink the other account to continue",
-                });
-              } else {
-                User.findOne({ _id: userId }, async (err, user) => {
-                  if (err) throw err;
+          if (existingUserWithThisGithub) {
+            throw new Http400Error(
+              "This GitHub Account has already been linked to another roadmapr account, please unlink the other account to continue"
+            );
+          }
 
-                  user.github = {
-                    id: githubUser.data.id,
-                    username: githubUser.data.login,
-                  };
+          const user = await User.findOne({ _id: req.params.id });
 
-                  await user.save();
+          if (!user) {
+            throw new Http404Error("User not found");
+          }
 
-                  return res.status(200).json({ user });
-                });
-              }
-            }
-          );
+          user.github = {
+            id: githubUser.data.id,
+            username: githubUser.data.login,
+          };
+          await user.save();
+
+          return res.status(200).json({ user });
+        } catch (error) {
+          next(error);
         }
       })
-      .catch((err) => {
-        res.status(404).json({ err });
+      .catch((error) => {
+        next(error);
       });
-  } else {
-    res.status(401).send();
+  } catch (error) {
+    next(error);
   }
 };
 

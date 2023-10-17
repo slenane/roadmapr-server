@@ -18,18 +18,18 @@ const getProfile = async (req, res, next) => {
 };
 
 const updateProfile = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const data = req.body.data;
-  const id = req.params.id;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Http404Error("User not found");
-  }
-
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const data = req.body.data;
+    const id = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("User not found");
+    }
+
     const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
 
     if (!user) {
@@ -43,11 +43,11 @@ const updateProfile = async (req, res, next) => {
 };
 
 const updateProfileImage = async (req, res, next) => {
-  if (!req.file) {
-    throw new Http400Error("No file was provided");
-  }
-
   try {
+    if (!req.file) {
+      throw new Http400Error("No file was provided");
+    }
+
     const user = await User.findByIdAndUpdate(
       req.auth._id,
       { profileImage: req.file.location },

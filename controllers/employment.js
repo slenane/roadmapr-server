@@ -22,16 +22,16 @@ const getEmployment = async (req, res, next) => {
 };
 
 const createEmploymentItem = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const employmentItem = new EmploymentItem({
-    ...req.body.data,
-    employment: req.params.id,
-  });
-
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const employmentItem = new EmploymentItem({
+      ...req.body.data,
+      employment: req.params.id,
+    });
+
     await employmentItem.save();
 
     const employment = await Employment.findById(employmentItem.employment)
@@ -52,24 +52,24 @@ const createEmploymentItem = async (req, res, next) => {
 };
 
 const updateEmploymentItem = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const employmentItem = req.body.data;
-  const id = req.body.data._id;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Http404Error("Employment item not found");
-  }
-
-  await EmploymentItem.findByIdAndUpdate(
-    id,
-    { ...employmentItem, id },
-    { new: true }
-  );
-
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const employmentItem = req.body.data;
+    const id = req.body.data._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Employment item not found");
+    }
+
+    await EmploymentItem.findByIdAndUpdate(
+      id,
+      { ...employmentItem, id },
+      { new: true }
+    );
+
     const employment = await Employment.findById(employmentItem.employment)
       .populate("employmentList")
       .exec();
@@ -85,23 +85,27 @@ const updateEmploymentItem = async (req, res, next) => {
 };
 
 const bulkUpdateEmploymentItems = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const employmentItems = req.body.data;
-
-  employmentItems.forEach(async (item) => {
-    const id = item._id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Http404Error("Employment item not found");
+  try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
     }
 
-    await EmploymentItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
-  });
+    const employmentItems = req.body.data;
 
-  try {
+    employmentItems.forEach(async (item) => {
+      const id = item._id;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Http404Error("Employment item not found");
+      }
+
+      await EmploymentItem.findByIdAndUpdate(
+        id,
+        { ...item, id },
+        { new: true }
+      );
+    });
+
     const employment = await Employment.findById(req.params.id)
       .populate("employmentList")
       .exec();
@@ -117,20 +121,20 @@ const bulkUpdateEmploymentItems = async (req, res, next) => {
 };
 
 const deleteEmploymentItem = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const employmentItem = req.body.data;
-  const employmentId = employmentItem.employment;
-
-  if (!mongoose.Types.ObjectId.isValid(employmentItem._id)) {
-    throw new Http404Error("Employment item not found");
-  }
-
-  await EmploymentItem.findByIdAndRemove(employmentItem._id);
-
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const employmentItem = req.body.data;
+    const employmentId = employmentItem.employment;
+
+    if (!mongoose.Types.ObjectId.isValid(employmentItem._id)) {
+      throw new Http404Error("Employment item not found");
+    }
+
+    await EmploymentItem.findByIdAndRemove(employmentItem._id);
+
     const employment = await Employment.findById(employmentId)
       .populate("employmentList")
       .exec();

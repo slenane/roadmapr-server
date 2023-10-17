@@ -7,7 +7,7 @@ const User = require("../models/User.js");
 passport.use(
   new LocalStrategy(
     {
-      usernameField: "email", // set the username field to be 'email'
+      usernameField: "email",
       passwordField: "password",
     },
     (username, password, done) => {

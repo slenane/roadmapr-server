@@ -23,16 +23,16 @@ const getEducation = async (req, res, next) => {
 };
 
 const createEducationItem = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const educationItem = new EducationItem({
-    ...req.body.data,
-    education: req.params.id,
-  });
-
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const educationItem = new EducationItem({
+      ...req.body.data,
+      education: req.params.id,
+    });
+
     await educationItem.save();
 
     const education = await Education.findById(educationItem.education)
@@ -53,24 +53,24 @@ const createEducationItem = async (req, res, next) => {
 };
 
 const updateEducationItem = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const educationItem = req.body.data;
-  const id = req.body.data._id;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Http404Error("Education item not found");
-  }
-
-  await EducationItem.findByIdAndUpdate(
-    id,
-    { ...educationItem, id },
-    { new: true }
-  );
-
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const educationItem = req.body.data;
+    const id = req.body.data._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Education item not found");
+    }
+
+    await EducationItem.findByIdAndUpdate(
+      id,
+      { ...educationItem, id },
+      { new: true }
+    );
+
     const education = await Education.findById(educationItem.education)
       .populate("educationList")
       .exec();
@@ -86,23 +86,23 @@ const updateEducationItem = async (req, res, next) => {
 };
 
 const bulkUpdateEducationItems = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const educationItems = req.body.data;
-
-  educationItems.forEach(async (item) => {
-    const id = item._id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Http404Error("Education item not found");
+  try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
     }
 
-    await EducationItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
-  });
+    const educationItems = req.body.data;
 
-  try {
+    await educationItems.forEach(async (item) => {
+      const id = item._id;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Http404Error("Education item not found");
+      }
+
+      await EducationItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
+    });
+
     const education = await Education.findById(req.params.id)
       .populate("educationList")
       .exec();
@@ -118,21 +118,21 @@ const bulkUpdateEducationItems = async (req, res, next) => {
 };
 
 const deleteEducationItem = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  let educationItem = req.body.data;
-  let educationId = educationItem.education;
-  const id = req.body.data._id;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Http404Error("Education item not found");
-  }
-
-  await EducationItem.findByIdAndRemove(educationItem._id);
-
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    let educationItem = req.body.data;
+    let educationId = educationItem.education;
+    const id = req.body.data._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Education item not found");
+    }
+
+    await EducationItem.findByIdAndRemove(educationItem._id);
+
     const education = await Education.findById(educationId)
       .populate("educationList")
       .exec();

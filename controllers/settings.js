@@ -27,18 +27,18 @@ const getSettings = async (req, res, next) => {
 };
 
 const updateSettings = async (req, res, next) => {
-  if (!req.body.data) {
-    throw new Http400Error("No information was provided");
-  }
-
-  const data = req.body.data;
-  const id = req.params.id;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Http404Error("Settings not found");
-  }
-
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const data = req.body.data;
+    const id = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Settings not found");
+    }
+
     const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
 
     if (!user) {
@@ -54,11 +54,11 @@ const updateSettings = async (req, res, next) => {
 };
 
 const updatePassword = async (req, res, next) => {
-  if (!req.body.password) {
-    throw new Http400Error("No information was provided");
-  }
-
   try {
+    if (!req.body.password) {
+      throw new Http400Error("No information was provided");
+    }
+
     const user = await User.findById(req.auth._id);
 
     if (!user) {

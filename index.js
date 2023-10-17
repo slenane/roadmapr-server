@@ -9,6 +9,12 @@ const config = require("./config");
 const cookieSession = require("cookie-session");
 const mongoose = require("mongoose");
 const passport = require("passport");
+const {
+  logError,
+  logErrorMiddleware,
+  returnError,
+  isOperationalError,
+} = require("./errorHandler");
 require("./middleware/auth.js");
 
 const app = express();
@@ -73,12 +79,19 @@ app.use("/api/projects", projectsRoutes);
 app.use("/api/settings", settingsRoutes);
 
 // ERROR HANDLERS
-app.use(function (err, req, res, next) {
-  if (err.name === "UnauthorizedError") {
-    res.status(401);
-    res.json({ message: err.name + ": " + err.message });
+app.use(logErrorMiddleware);
+app.use(returnError);
+
+process.on("unhandledRejection", (error) => {
+  throw error;
+});
+
+process.on("uncaughtException", (error) => {
+  logError(error);
+
+  if (!isOperationalError(error)) {
+    process.exit(1);
   }
-  console.log(err);
 });
 
 // LISTENING

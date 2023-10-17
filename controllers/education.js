@@ -1,120 +1,148 @@
 const mongoose = require("mongoose");
 const Education = require("../models/education/Education.js");
 const EducationItem = require("../models/education/EducationItem.js");
+const Http404Error = require("../utils/errorHandling/http404Error");
+const Http400Error = require("../utils/errorHandling/http400Error.js");
 // const fetchEducationItem = require("../utils/fetchEducationItem.js");
 
-const getEducation = (req, res) => {
+const getEducation = async (req, res, next) => {
   try {
-    Education.find({ user: req.auth._id })
+    const education = await Education.findOne({ user: req.auth._id })
       .populate("educationList")
-      .exec((err, education) => {
-        if (err) {
-          education = new Education({ user: req.auth._id });
-          education.save();
-        }
-        res.status(200).json(education[0]);
-      });
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
+      .exec();
 
-const createEducationItem = async (req, res) => {
-  if (!req.body.data) return;
-
-  const educationItem = new EducationItem({
-    ...req.body.data,
-    education: req.params.id,
-  });
-
-  try {
-    await educationItem.save();
-
-    Education.findById(educationItem.education)
-      .populate("educationList")
-      .exec((err, education) => {
-        education["educationList"].push(educationItem);
-        education.save();
-
-        res.status(200).json(education);
-      });
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
-
-const updateEducationItem = async (req, res) => {
-  if (!req.body.data) return;
-
-  const educationItem = req.body.data;
-  const id = req.body.data._id;
-
-  if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(404).send("No item with that id");
-
-  await EducationItem.findByIdAndUpdate(
-    id,
-    { ...educationItem, id },
-    { new: true }
-  );
-
-  try {
-    Education.findById(req.params.id)
-      .populate("educationList")
-      .exec((err, education) => {
-        res.status(201).json(education);
-      });
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
-
-const bulkUpdateEducationItems = async (req, res) => {
-  if (!req.body.data) return;
-
-  const educationItems = req.body.data;
-
-  educationItems.forEach(async (item) => {
-    const id = item._id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(404).send("No item with that id");
+    if (!education) {
+      education = new Education({ user: req.auth._id }).exec();
+      await education.save();
     }
 
-    await EducationItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
-  });
-
-  try {
-    Education.findById(req.params.id)
-      .populate("educationList")
-      .exec((err, education) => {
-        res.status(201).json(education);
-      });
+    res.status(200).json(education);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
   }
 };
 
-const deleteEducationItem = async (req, res) => {
-  if (!req.body.data) return;
-
-  let educationItem = req.body.data;
-  let educationId = educationItem.education;
-  const id = req.body.data._id;
-
-  if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(404).send("No item with that id");
-
-  await EducationItem.findByIdAndRemove(educationItem._id);
-
+const createEducationItem = async (req, res, next) => {
   try {
-    Education.findById(educationId)
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const educationItem = new EducationItem({
+      ...req.body.data,
+      education: req.params.id,
+    });
+
+    await educationItem.save();
+
+    const education = await Education.findById(educationItem.education)
       .populate("educationList")
-      .exec((err, education) => {
-        res.status(200).json(education);
-      });
+      .exec();
+
+    if (!education) {
+      throw new Http404Error("Education data not found");
+    }
+
+    education["educationList"].push(educationItem);
+    await education.save();
+
+    res.status(200).json(education);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
+  }
+};
+
+const updateEducationItem = async (req, res, next) => {
+  try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const educationItem = req.body.data;
+    const id = req.body.data._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Education item not found");
+    }
+
+    await EducationItem.findByIdAndUpdate(
+      id,
+      { ...educationItem, id },
+      { new: true }
+    );
+
+    const education = await Education.findById(educationItem.education)
+      .populate("educationList")
+      .exec();
+
+    if (!education) {
+      throw new Http404Error("Education data not found");
+    }
+
+    res.status(201).json(education);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const bulkUpdateEducationItems = async (req, res, next) => {
+  try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const educationItems = req.body.data;
+
+    await educationItems.forEach(async (item) => {
+      const id = item._id;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Http404Error("Education item not found");
+      }
+
+      await EducationItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
+    });
+
+    const education = await Education.findById(req.params.id)
+      .populate("educationList")
+      .exec();
+
+    if (!education) {
+      throw new Http404Error("Education data not found");
+    }
+
+    res.status(201).json(education);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteEducationItem = async (req, res, next) => {
+  try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    let educationItem = req.body.data;
+    let educationId = educationItem.education;
+    const id = req.body.data._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Education item not found");
+    }
+
+    await EducationItem.findByIdAndRemove(educationItem._id);
+
+    const education = await Education.findById(educationId)
+      .populate("educationList")
+      .exec();
+
+    if (!education) {
+      throw new Http404Error("Education data not found");
+    }
+    res.status(200).json(education);
+  } catch (error) {
+    next(error);
   }
 };
 

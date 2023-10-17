@@ -6,110 +6,129 @@ const EmploymentItem = require("../models/employment/EmploymentItem.js");
 const Employment = require("../models/employment/Employment.js");
 const ProjectItem = require("../models/projects/ProjectItem.js");
 const Projects = require("../models/projects/Projects.js");
+const Http500Error = require("../utils/errorHandling/http500Error.js");
+const Http404Error = require("../utils/errorHandling/http404Error.js");
+const Http400Error = require("../utils/errorHandling/http400Error.js");
 
-const getSettings = async (req, res) => {
+const getSettings = async (req, res, next) => {
   try {
-    User.findById(req.auth._id, (err, user) => {
-      res.status(200).json({
-        email: user.email,
-        github: user.github,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        notifications: user.notifications,
-        preferredLanguage: user.preferredLanguage,
-        theme: user.theme,
-        userId: user._id,
-        username: user.username,
-      });
-    });
+    const user = await User.findById(req.auth._id);
+
+    if (!user) {
+      throw new Http404Error("User not found");
+    }
+
+    const settings = extractSettings(user);
+
+    res.status(200).json(settings);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
   }
 };
 
-const updateSettings = async (req, res) => {
-  let data = req.body.data;
-  const id = req.params.id;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).send("No item with that id");
-  }
-
+const updateSettings = async (req, res, next) => {
   try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const data = req.body.data;
+    const id = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Settings not found");
+    }
+
     const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
-    res.status(200).json({
-      email: user.email,
-      github: user.github,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      notifications: user.notifications,
-      preferredLanguage: user.preferredLanguage,
-      theme: user.theme,
-      userId: user._id,
-      username: user.username,
-    });
+
+    if (!user) {
+      throw new Http404Error("User not found");
+    }
+
+    const settings = extractSettings(user);
+
+    res.status(200).json(settings);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
   }
 };
 
-const updatePassword = async (req, res) => {
+const updatePassword = async (req, res, next) => {
   try {
-    User.findById(req.auth._id, async (err, user) => {
-      if (req.body.password) {
-        await user.setPassword(req.body.password);
-        await user.save();
-      }
+    if (!req.body.password) {
+      throw new Http400Error("No information was provided");
+    }
 
-      res.status(200).json({
-        email: user.email,
-        github: user.github,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        notifications: user.notifications,
-        preferredLanguage: user.preferredLanguage,
-        theme: user.theme,
-        userId: user._id,
-        username: user.username,
-      });
-    });
+    const user = await User.findById(req.auth._id);
+
+    if (!user) {
+      throw new Http404Error("User not found");
+    }
+
+    await user.setPassword(req.body.password);
+    await user.save();
+
+    const settings = extractSettings(user);
+
+    res.status(200).json(settings);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
   }
 };
 
-const deleteAccount = async (req, res) => {
+const deleteAccount = async (req, res, next) => {
+  const userId = req.auth._id;
+
   try {
-    const userId = req.auth._id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new Http404Error("User not found");
+    }
 
     // Delete Education
     const education = await Education.findOne({ user: userId });
-    if (education) {
-      await EducationItem.deleteMany({ education: education._id });
-      await Education.deleteOne({ user: userId });
+    if (!education) {
+      throw new Http500Error("Education data could not be deleted");
     }
+    await EducationItem.deleteMany({ education: education._id });
+    await Education.deleteOne({ user: userId });
 
     // Delete Employment
     const employment = await Employment.findOne({ user: userId });
-    if (employment) {
-      await EmploymentItem.deleteMany({ employment: employment._id });
-      await Employment.deleteOne({ user: userId });
+    if (!employment) {
+      throw new Http500Error("Employment data could not be deleted");
     }
+    await EmploymentItem.deleteMany({ employment: employment._id });
+    await Employment.deleteOne({ user: userId });
 
     // Delete Projects
     const projects = await Projects.findOne({ user: userId });
-    if (projects) {
-      await ProjectItem.deleteMany({ projects: projects._id });
-      await Projects.deleteOne({ user: userId });
+    if (!projects) {
+      throw new Http500Error("Project data could not be deleted");
     }
+    await ProjectItem.deleteMany({ projects: projects._id });
+    await Projects.deleteOne({ user: userId });
 
     // Delete User
     await User.deleteOne({ _id: userId });
 
     res.status(200).json({ message: "Account deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
+};
+
+const extractSettings = (user) => {
+  return {
+    email: user.email,
+    github: user.github,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    notifications: user.notifications,
+    preferredLanguage: user.preferredLanguage,
+    theme: user.theme,
+    userId: user._id,
+    username: user.username,
+  };
 };
 
 module.exports = { getSettings, updateSettings, updatePassword, deleteAccount };

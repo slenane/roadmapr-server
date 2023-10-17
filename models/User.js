@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const emailRegex = /^\S+@\S+\.\S+$/;
 
 const Schema = mongoose.Schema;
 
@@ -11,6 +12,7 @@ const userSchema = new Schema({
     type: String,
     unique: true,
     required: true,
+    match: emailRegex,
   },
   emailToken: String,
   isVerified: Boolean,
@@ -56,6 +58,7 @@ const userSchema = new Schema({
     type: String,
     unique: true,
     required: true,
+    minlength: 2,
   },
   education: String,
   employment: String,
@@ -95,3 +98,38 @@ userSchema.methods.generateJwt = function () {
 };
 
 module.exports = mongoose.model("User", userSchema);
+
+// const initialUser = {
+//   bio: "",
+//   coverImage: "",
+//   email: "",
+//   emailToken: "",
+//   isVerified: false,
+//   github: {
+//     id: "",
+//     username: "",
+//   },
+//   interests: {
+//     professional_interests: [],
+//     personal_interests: [],
+//   },
+//   languagesSpoken: [],
+//   links: {
+//     cv: "",
+//     portfolio: "",
+//     x: "",
+//     linkedIn: "",
+//   },
+//   location: "",
+//   firstName: "",
+//   lastName: "",
+//   nationality: "",
+//   notifications: true,
+//   preferredLanguage: "en",
+//   previousEducation: [],
+//   profileImage: "",
+//   path: "",
+//   stack: [],
+//   theme: "dark",
+//   username: "",
+// };

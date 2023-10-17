@@ -1,124 +1,148 @@
 const mongoose = require("mongoose");
 const Projects = require("../models/projects/Projects.js");
 const ProjectItem = require("../models/projects/ProjectItem.js");
-// const User = require("../models/User.js");
+const Http400Error = require("../utils/errorHandling/http400Error.js");
+const Http404Error = require("../utils/errorHandling/http404Error.js");
 
-const getProjects = (req, res) => {
-  // let projectsId;
-  // if (req.params.id) {
-  //   projectsId = req.params.id;
-  // } else {
-  //   User.findById(req.auth._id, (err, user) => {
-  //     projectsId = user.projects;
-  //   });
-  // }
-
+const getProjects = async (req, res, next) => {
   try {
-    Projects.find({ user: req.auth._id })
+    const projects = await Projects.findOne({ user: req.auth._id })
       .populate("projectList")
-      .exec((err, projects) => {
-        if (err) {
-          projects = new Projects({});
-          projects.save();
-        }
+      .exec();
 
-        res.status(200).json(projects[0]);
-      });
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
-
-const createProjectItem = async (req, res) => {
-  const projectItem = new ProjectItem({
-    ...req.body.data,
-    projects: req.params.id,
-  });
-
-  try {
-    await projectItem.save();
-
-    Projects.findById(projectItem.projects)
-      .populate("projectList")
-      .exec((err, projects) => {
-        projects.projectList.push(projectItem);
-        projects.save();
-
-        res.status(200).json(projects);
-      });
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
-
-const updateProjectItem = async (req, res) => {
-  let projectItem = req.body.data;
-  const id = req.body.data._id;
-
-  if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(404).send("No item with that id");
-
-  projectItem = await ProjectItem.findByIdAndUpdate(
-    id,
-    { ...projectItem, id },
-    { new: true }
-  );
-
-  try {
-    Projects.findById(projectItem.projects)
-      .populate("projectList")
-      .exec((err, projects) => {
-        res.status(201).json(projects);
-      });
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
-
-const bulkUpdateProjectItems = async (req, res) => {
-  if (!req.body.data) return;
-
-  const projectItems = req.body.data;
-
-  projectItems.forEach(async (item) => {
-    const id = item._id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(404).send("No item with that id");
+    if (!projects) {
+      projects = new Projects({ user: req.auth._id }).exec();
+      await projects.save();
     }
 
-    await ProjectItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
-  });
-
-  try {
-    Projects.findById(req.params.id)
-      .populate("projectList")
-      .exec((err, projects) => {
-        res.status(201).json(projects);
-      });
+    res.status(200).json(projects);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
   }
 };
 
-const deleteProjectItem = async (req, res) => {
-  let projectItem = req.body.data;
-  let projectsId = projectItem.projects;
-  const id = req.body.data._id;
-
-  if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(404).send("No item with that id");
-
-  await ProjectItem.findByIdAndRemove(projectItem._id);
-
+const createProjectItem = async (req, res, next) => {
   try {
-    Projects.findById(projectsId)
-      .populate(["projectList"])
-      .exec((err, projects) => {
-        res.status(200).json(projects);
-      });
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const projectItem = new ProjectItem({
+      ...req.body.data,
+      projects: req.params.id,
+    });
+
+    await projectItem.save();
+
+    const projects = await Projects.findById(projectItem.projects)
+      .populate("projectList")
+      .exec();
+
+    if (!projects) {
+      throw new Http404Error("Project data not found");
+    }
+
+    projects.projectList.push(projectItem);
+    await projects.save();
+
+    res.status(200).json(projects);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    next(error);
+  }
+};
+
+const updateProjectItem = async (req, res, next) => {
+  try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const projectItem = req.body.data;
+    const id = req.body.data._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Project item not found");
+    }
+
+    await ProjectItem.findByIdAndUpdate(
+      id,
+      { ...projectItem, id },
+      { new: true }
+    );
+
+    const projects = await Projects.findById(projectItem.projects)
+      .populate("projectList")
+      .exec();
+
+    if (!projects) {
+      throw new Http404Error("Project data not found");
+    }
+
+    res.status(201).json(projects);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const bulkUpdateProjectItems = async (req, res, next) => {
+  try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const projectItems = req.body.data;
+
+    projectItems.forEach(async (item) => {
+      const id = item._id;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Http404Error("Project item not found");
+      }
+
+      await ProjectItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
+    });
+
+    const projects = await Projects.findById(req.params.id)
+      .populate("projectList")
+      .exec();
+
+    if (!projects) {
+      throw new Http404Error("Project data not found");
+    }
+
+    res.status(201).json(projects);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteProjectItem = async (req, res, next) => {
+  try {
+    if (!req.body.data) {
+      throw new Http400Error("No information was provided");
+    }
+
+    const projectItem = req.body.data;
+    const projectsId = projectItem.projects;
+    const id = req.body.data._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error("Project item not found");
+    }
+
+    await ProjectItem.findByIdAndRemove(projectItem._id);
+
+    const projects = await Projects.findById(projectsId)
+      .populate("projectList")
+      .exec();
+
+    if (!projects) {
+      throw new Http404Error("Project data not found");
+    }
+
+    res.status(200).json(projects);
+  } catch (error) {
+    next(error);
   }
 };
 

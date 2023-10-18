@@ -46,7 +46,7 @@ const createEducationItem = async (req, res, next) => {
     education["educationList"].push(educationItem);
     await education.save();
 
-    res.status(200).json(education);
+    res.status(200).json({ education, successMessage: "Education Updated" });
   } catch (error) {
     next(error);
   }
@@ -79,7 +79,9 @@ const updateEducationItem = async (req, res, next) => {
       throw new Http404Error("Education data not found");
     }
 
-    res.status(201).json(education);
+    res
+      .status(201)
+      .json({ education, successMessage: "Education Item Updated" });
   } catch (error) {
     next(error);
   }
@@ -111,7 +113,9 @@ const bulkUpdateEducationItems = async (req, res, next) => {
       throw new Http404Error("Education data not found");
     }
 
-    res.status(201).json(education);
+    res
+      .status(201)
+      .json({ education, successMessage: "Education Items Updated" });
   } catch (error) {
     next(error);
   }
@@ -140,7 +144,9 @@ const deleteEducationItem = async (req, res, next) => {
     if (!education) {
       throw new Http404Error("Education data not found");
     }
-    res.status(200).json(education);
+    res
+      .status(200)
+      .json({ education, successMessage: "Education Item Removed" });
   } catch (error) {
     next(error);
   }

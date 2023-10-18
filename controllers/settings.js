@@ -47,7 +47,7 @@ const updateSettings = async (req, res, next) => {
 
     const settings = extractSettings(user);
 
-    res.status(200).json(settings);
+    res.status(200).json({ settings, successMessage: "Settings Updated" });
   } catch (error) {
     next(error);
   }
@@ -70,7 +70,7 @@ const updatePassword = async (req, res, next) => {
 
     const settings = extractSettings(user);
 
-    res.status(200).json(settings);
+    res.status(200).json({ settings, successMessage: "Password Updated" });
   } catch (error) {
     next(error);
   }
@@ -111,7 +111,7 @@ const deleteAccount = async (req, res, next) => {
     // Delete User
     await User.deleteOne({ _id: userId });
 
-    res.status(200).json({ message: "Account deleted successfully" });
+    res.status(200).json({ successMessage: "Account deleted successfully" });
   } catch (error) {
     next(error);
   }

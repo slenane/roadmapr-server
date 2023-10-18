@@ -45,7 +45,7 @@ const createProjectItem = async (req, res, next) => {
     projects.projectList.push(projectItem);
     await projects.save();
 
-    res.status(200).json(projects);
+    res.status(200).json({ projects, successMessage: "Projects Updated" });
   } catch (error) {
     next(error);
   }
@@ -78,7 +78,7 @@ const updateProjectItem = async (req, res, next) => {
       throw new Http404Error("Project data not found");
     }
 
-    res.status(201).json(projects);
+    res.status(201).json({ projects, successMessage: "Projects Updated" });
   } catch (error) {
     next(error);
   }
@@ -110,7 +110,7 @@ const bulkUpdateProjectItems = async (req, res, next) => {
       throw new Http404Error("Project data not found");
     }
 
-    res.status(201).json(projects);
+    res.status(201).json({ projects, successMessage: "Project Items Updated" });
   } catch (error) {
     next(error);
   }
@@ -140,7 +140,7 @@ const deleteProjectItem = async (req, res, next) => {
       throw new Http404Error("Project data not found");
     }
 
-    res.status(200).json(projects);
+    res.status(200).json({ projects, successMessage: "Project Removed" });
   } catch (error) {
     next(error);
   }

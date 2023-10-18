@@ -45,7 +45,7 @@ const createEmploymentItem = async (req, res, next) => {
     employment.employmentList.push(employmentItem);
     await employment.save();
 
-    res.status(200).json(employment);
+    res.status(200).json({ employment, successMessage: "Employment Updated" });
   } catch (error) {
     next(error);
   }
@@ -78,7 +78,7 @@ const updateEmploymentItem = async (req, res, next) => {
       throw new Http404Error("Employment data not found");
     }
 
-    res.status(201).json(employment);
+    res.status(201).json({ employment, successMessage: "Employment Updated" });
   } catch (error) {
     next(error);
   }
@@ -114,7 +114,9 @@ const bulkUpdateEmploymentItems = async (req, res, next) => {
       throw new Http404Error("Employment data not found");
     }
 
-    res.status(201).json(employment);
+    res
+      .status(201)
+      .json({ employment, successMessage: "Employment Items Updated" });
   } catch (error) {
     next(error);
   }
@@ -143,7 +145,7 @@ const deleteEmploymentItem = async (req, res, next) => {
       throw new Http404Error("Employment data not found");
     }
 
-    res.status(200).json(employment);
+    res.status(200).json({ employment, successMessage: "Employment Removed" });
   } catch (error) {
     next(error);
   }

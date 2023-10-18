@@ -36,7 +36,7 @@ const updateProfile = async (req, res, next) => {
       throw new Http404Error("User not found");
     }
 
-    res.status(200).json(user);
+    res.status(200).json({ user, successMessage: "Profile Updated" });
   } catch (error) {
     next(error);
   }
@@ -58,7 +58,7 @@ const updateProfileImage = async (req, res, next) => {
       throw new Http404Error("User not found");
     }
 
-    res.status(200).json(user);
+    res.status(200).json({ user, successMessage: "Profile Image Updated" });
   } catch (error) {
     next(error);
   }

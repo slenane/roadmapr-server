@@ -15,7 +15,7 @@ const getSettings = async (req, res, next) => {
     const user = await User.findById(req.auth._id);
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error("ALERTS.AUTH.ERROR.USER_NOT_FOUND");
     }
 
     const settings = extractSettings(user);
@@ -42,7 +42,7 @@ const updateSettings = async (req, res, next) => {
     const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error("ALERTS.AUTH.ERROR.USER_NOT_FOUND");
     }
 
     const settings = extractSettings(user);
@@ -62,7 +62,7 @@ const updatePassword = async (req, res, next) => {
     const user = await User.findById(req.auth._id);
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error("ALERTS.AUTH.ERROR.USER_NOT_FOUND");
     }
 
     await user.setPassword(req.body.password);
@@ -81,7 +81,7 @@ const deleteAccount = async (req, res, next) => {
 
   try {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      throw new Http404Error("User not found");
+      throw new Http404Error("ALERTS.AUTH.ERROR.USER_NOT_FOUND");
     }
 
     // Delete Education

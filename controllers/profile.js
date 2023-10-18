@@ -8,7 +8,7 @@ const getProfile = async (req, res, next) => {
     const user = await User.findById(req.auth._id);
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error("ALERTS.AUTH.ERROR.USER_NOT_FOUND");
     }
 
     res.status(200).json(user);
@@ -27,13 +27,13 @@ const updateProfile = async (req, res, next) => {
     const id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Http404Error("User not found");
+      throw new Http404Error("ALERTS.AUTH.ERROR.USER_NOT_FOUND");
     }
 
     const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error("ALERTS.AUTH.ERROR.USER_NOT_FOUND");
     }
 
     res.status(200).json({ user, successMessage: "Profile Updated" });
@@ -55,7 +55,7 @@ const updateProfileImage = async (req, res, next) => {
     );
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error("ALERTS.AUTH.ERROR.USER_NOT_FOUND");
     }
 
     res.status(200).json({ user, successMessage: "Profile Image Updated" });

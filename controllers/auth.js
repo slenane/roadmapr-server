@@ -12,6 +12,7 @@ AWS.config.update({ region: config.AWS_BUCKET_REGION });
 const Http400Error = require("../utils/errorHandling/http400Error");
 const Http404Error = require("../utils/errorHandling/http404Error");
 const Http500Error = require("../utils/errorHandling/http500Error");
+const ALERTS = require("../utils/alerts");
 const validPasswordRegex =
   /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,20}$/;
 const emailRegex = /^\S+@\S+\.\S+$/;
@@ -19,33 +20,25 @@ const emailRegex = /^\S+@\S+\.\S+$/;
 const register = async (req, res, next) => {
   try {
     if (!req.body) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
     if (!req.body.username || !req.body.email || !req.body.password) {
-      throw new Http400Error(
-        "Required information missing, please check all required fields have been filled"
-      );
+      throw new Http400Error(ALERTS.MISSING_FIELDS);
     }
     if (req.body.username.length < 2) {
-      throw new Http400Error("Username must be of minimum length 2 characters");
+      throw new Http400Error(ALERTS.AUTH.ERROR.USERNAME_INVALID);
     }
     if (await User.exists({ username: req.body.username })) {
-      throw new Http400Error(
-        "Username already in use, please try something else"
-      );
+      throw new Http400Error(ALERTS.AUTH.ERROR.USERNAME_USED);
     }
     if (!emailRegex.test(req.body.email)) {
-      throw new Http400Error("Email is not valid");
+      throw new Http400Error(ALERTS.AUTH.ERROR.EMAIL_INVALID);
     }
     if (await User.exists({ email: req.body.email })) {
-      throw new Http400Error(
-        "Email already in use, please log in or try a different email"
-      );
+      throw new Http400Error(ALERTS.AUTH.ERROR.EMAIL_USED);
     }
     if (!validPasswordRegex.test(req.body.password)) {
-      throw new Http400Error(
-        "Password invalid: Passwords must be at least 6 characters long, contains at least 1 number and 1 special character (!@#$%^&*)"
-      );
+      throw new Http400Error(ALERTS.AUTH.ERROR.PASSWORD_INVALID);
     }
 
     const user = new User({
@@ -99,7 +92,7 @@ const verifyEmail = async (req, res) => {
     const user = await User.findOne({ emailToken: req.query.token });
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     user.emailToken = null;
@@ -120,7 +113,7 @@ const login = (req, res, next) => {
       }
 
       if (!user) {
-        throw new Http404Error("Invalid Username or Password");
+        throw new Http404Error(ALERTS.AUTH.ERROR.USERNAME_PASSWORD_INVALID);
       }
 
       const token = user.generateJwt();
@@ -134,7 +127,7 @@ const login = (req, res, next) => {
 const isUniqueUsername = async (req, res, next) => {
   try {
     if (!req.params.username) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const user = await User.exists({ username: req.params.username });
@@ -149,7 +142,7 @@ const isUniqueUsername = async (req, res, next) => {
 const isUniqueEmail = async (req, res, next) => {
   try {
     if (!req.params.email) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const user = await User.exists({ email: req.params.email });
@@ -212,7 +205,7 @@ const getAccessToken = (req, res, next) => {
 const getGithubUser = async (req, res, next) => {
   try {
     if (!req.session.token) {
-      throw new Http500Error("Token not provided, please try again");
+      throw new Http500Error(ALERTS.AUTH.ERROR.TOKEN_NOT_PROVIDED);
     }
 
     axios({
@@ -299,10 +292,10 @@ const getGithubUser = async (req, res, next) => {
 const updateGithubExistingUser = (req, res) => {
   try {
     if (!req.session.token) {
-      throw new Http500Error("Token not provided, please try again");
+      throw new Http500Error(ALERTS.AUTH.ERROR.TOKEN_NOT_PROVIDED);
     }
     if (!req.params.id) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     axios({
@@ -317,15 +310,13 @@ const updateGithubExistingUser = (req, res) => {
           });
 
           if (existingUserWithThisGithub) {
-            throw new Http400Error(
-              "This GitHub Account has already been linked to another roadmapr account, please unlink the other account to continue"
-            );
+            throw new Http400Error(ALERTS.AUTH.ERROR.GITHUB_LINKED);
           }
 
           const user = await User.findOne({ _id: req.params.id });
 
           if (!user) {
-            throw new Http404Error("User not found");
+            throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
           }
 
           user.github = {
@@ -334,7 +325,10 @@ const updateGithubExistingUser = (req, res) => {
           };
           await user.save();
 
-          return res.status(200).json({ user });
+          return res.status(200).json({
+            user,
+            successMessage: ALERTS.AUTH.SUCCESS.GITHUB_LINKED,
+          });
         } catch (error) {
           next(error);
         }

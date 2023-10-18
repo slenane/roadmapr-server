@@ -17,17 +17,13 @@ passport.use(
         }
         // Return if user not found in database
         if (!user) {
-          return done(null, false, {
-            message: "User not found",
-          });
+          return done(null, false);
         }
 
         const valid = await user.validPassword(password);
         // Return if password is wrong
         if (!valid) {
-          return done(null, false, {
-            message: "Password is wrong",
-          });
+          return done(null, false);
         }
         // If credentials are correct, return the user object
         return done(null, user);

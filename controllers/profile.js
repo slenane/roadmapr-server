@@ -2,13 +2,14 @@ const mongoose = require("mongoose");
 const User = require("../models/User.js");
 const Http404Error = require("../utils/errorHandling/http404Error.js");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
+const ALERTS = require("../utils/alerts");
 
 const getProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.auth._id);
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     res.status(200).json(user);
@@ -20,23 +21,25 @@ const getProfile = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     if (!req.body.data) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const data = req.body.data;
     const id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
-    res.status(200).json(user);
+    res
+      .status(200)
+      .json({ user, successMessage: ALERTS.PROFILE.SUCCESS.UPDATED });
   } catch (error) {
     next(error);
   }
@@ -45,7 +48,7 @@ const updateProfile = async (req, res, next) => {
 const updateProfileImage = async (req, res, next) => {
   try {
     if (!req.file) {
-      throw new Http400Error("No file was provided");
+      throw new Http400Error(ALERTS.PROFILE.ERROR.FILE_NOT_PROVIDED);
     }
 
     const user = await User.findByIdAndUpdate(
@@ -55,10 +58,12 @@ const updateProfileImage = async (req, res, next) => {
     );
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
-    res.status(200).json(user);
+    res
+      .status(200)
+      .json({ user, successMessage: ALERTS.PROFILE.SUCCESS.IMAGE_UPDATED });
   } catch (error) {
     next(error);
   }

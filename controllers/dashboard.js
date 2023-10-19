@@ -4,6 +4,7 @@ const Employment = require("../models/employment/Employment.js");
 const Projects = require("../models/projects/Projects.js");
 // const axios = require("axios"); // Get github data
 const Http404Error = require("../utils/errorHandling/http404Error");
+const ALERTS = require("../utils/alerts.js");
 
 const getDashboard = async (req, res, next) => {
   const id = req.auth._id;
@@ -11,7 +12,7 @@ const getDashboard = async (req, res, next) => {
     const user = await User.findById(id).exec();
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     const education = await Education.findById(user.education)

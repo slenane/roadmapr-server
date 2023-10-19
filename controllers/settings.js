@@ -9,13 +9,14 @@ const Projects = require("../models/projects/Projects.js");
 const Http500Error = require("../utils/errorHandling/http500Error.js");
 const Http404Error = require("../utils/errorHandling/http404Error.js");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
+const ALERTS = require("../utils/alerts.js");
 
 const getSettings = async (req, res, next) => {
   try {
     const user = await User.findById(req.auth._id);
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     const settings = extractSettings(user);
@@ -29,25 +30,27 @@ const getSettings = async (req, res, next) => {
 const updateSettings = async (req, res, next) => {
   try {
     if (!req.body.data) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const data = req.body.data;
     const id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Http404Error("Settings not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     const user = await User.findByIdAndUpdate(id, { ...data }, { new: true });
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     const settings = extractSettings(user);
 
-    res.status(200).json(settings);
+    res
+      .status(200)
+      .json({ settings, successMessage: ALERTS.SETTINGS.SUCCESS.UPDATED });
   } catch (error) {
     next(error);
   }
@@ -56,13 +59,13 @@ const updateSettings = async (req, res, next) => {
 const updatePassword = async (req, res, next) => {
   try {
     if (!req.body.password) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const user = await User.findById(req.auth._id);
 
     if (!user) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     await user.setPassword(req.body.password);
@@ -70,7 +73,10 @@ const updatePassword = async (req, res, next) => {
 
     const settings = extractSettings(user);
 
-    res.status(200).json(settings);
+    res.status(200).json({
+      settings,
+      successMessage: ALERTS.SETTINGS.SUCCESS.PASSWORD_UPDATED,
+    });
   } catch (error) {
     next(error);
   }
@@ -81,13 +87,13 @@ const deleteAccount = async (req, res, next) => {
 
   try {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      throw new Http404Error("User not found");
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     // Delete Education
     const education = await Education.findOne({ user: userId });
     if (!education) {
-      throw new Http500Error("Education data could not be deleted");
+      throw new Http500Error(ALERTS.SETTINGS.ERROR.EDUCATION_DATA);
     }
     await EducationItem.deleteMany({ education: education._id });
     await Education.deleteOne({ user: userId });
@@ -95,7 +101,7 @@ const deleteAccount = async (req, res, next) => {
     // Delete Employment
     const employment = await Employment.findOne({ user: userId });
     if (!employment) {
-      throw new Http500Error("Employment data could not be deleted");
+      throw new Http500Error(ALERTS.SETTINGS.ERROR.EMPLOYMENT_DATA);
     }
     await EmploymentItem.deleteMany({ employment: employment._id });
     await Employment.deleteOne({ user: userId });
@@ -103,7 +109,7 @@ const deleteAccount = async (req, res, next) => {
     // Delete Projects
     const projects = await Projects.findOne({ user: userId });
     if (!projects) {
-      throw new Http500Error("Project data could not be deleted");
+      throw new Http500Error(ALERTS.SETTINGS.ERROR.PROJECT_DATA);
     }
     await ProjectItem.deleteMany({ projects: projects._id });
     await Projects.deleteOne({ user: userId });
@@ -111,7 +117,7 @@ const deleteAccount = async (req, res, next) => {
     // Delete User
     await User.deleteOne({ _id: userId });
 
-    res.status(200).json({ message: "Account deleted successfully" });
+    res.status(200).json({ successMessage: ALERTS.SETTINGS.SUCCESS.DELETED });
   } catch (error) {
     next(error);
   }

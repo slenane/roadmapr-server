@@ -3,6 +3,7 @@ const Employment = require("../models/employment/Employment.js");
 const EmploymentItem = require("../models/employment/EmploymentItem.js");
 const Http404Error = require("../utils/errorHandling/http404Error");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
+const ALERTS = require("../utils/alerts.js");
 
 const getEmployment = async (req, res, next) => {
   try {
@@ -24,7 +25,7 @@ const getEmployment = async (req, res, next) => {
 const createEmploymentItem = async (req, res, next) => {
   try {
     if (!req.body.data) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const employmentItem = new EmploymentItem({
@@ -39,13 +40,15 @@ const createEmploymentItem = async (req, res, next) => {
       .exec();
 
     if (!employment) {
-      throw new Http404Error("Employment data not found");
+      throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.NOT_FOUND);
     }
 
     employment.employmentList.push(employmentItem);
     await employment.save();
 
-    res.status(200).json({ employment, successMessage: "Employment Updated" });
+    res
+      .status(200)
+      .json({ employment, successMessage: ALERTS.EMPLOYMENT.SUCCESS.UPDATED });
   } catch (error) {
     next(error);
   }
@@ -54,14 +57,14 @@ const createEmploymentItem = async (req, res, next) => {
 const updateEmploymentItem = async (req, res, next) => {
   try {
     if (!req.body.data) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const employmentItem = req.body.data;
     const id = req.body.data._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Http404Error("Employment item not found");
+      throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.ITEM_NOT_FOUND);
     }
 
     await EmploymentItem.findByIdAndUpdate(
@@ -75,10 +78,12 @@ const updateEmploymentItem = async (req, res, next) => {
       .exec();
 
     if (!employment) {
-      throw new Http404Error("Employment data not found");
+      throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.NOT_FOUND);
     }
 
-    res.status(201).json({ employment, successMessage: "Employment Updated" });
+    res
+      .status(201)
+      .json({ employment, successMessage: ALERTS.EMPLOYMENT.SUCCESS.UPDATED });
   } catch (error) {
     next(error);
   }
@@ -87,7 +92,7 @@ const updateEmploymentItem = async (req, res, next) => {
 const bulkUpdateEmploymentItems = async (req, res, next) => {
   try {
     if (!req.body.data) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const employmentItems = req.body.data;
@@ -96,7 +101,7 @@ const bulkUpdateEmploymentItems = async (req, res, next) => {
       const id = item._id;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new Http404Error("Employment item not found");
+        throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.ITEM_NOT_FOUND);
       }
 
       await EmploymentItem.findByIdAndUpdate(
@@ -111,12 +116,15 @@ const bulkUpdateEmploymentItems = async (req, res, next) => {
       .exec();
 
     if (!employment) {
-      throw new Http404Error("Employment data not found");
+      throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.NOT_FOUND);
     }
 
     res
       .status(201)
-      .json({ employment, successMessage: "Employment Items Updated" });
+      .json({
+        employment,
+        successMessage: ALERTS.EMPLOYMENT.SUCCESS.ITEMS_UPDATED,
+      });
   } catch (error) {
     next(error);
   }
@@ -125,14 +133,14 @@ const bulkUpdateEmploymentItems = async (req, res, next) => {
 const deleteEmploymentItem = async (req, res, next) => {
   try {
     if (!req.body.data) {
-      throw new Http400Error("No information was provided");
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
     const employmentItem = req.body.data;
     const employmentId = employmentItem.employment;
 
     if (!mongoose.Types.ObjectId.isValid(employmentItem._id)) {
-      throw new Http404Error("Employment item not found");
+      throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.ITEM_NOT_FOUND);
     }
 
     await EmploymentItem.findByIdAndRemove(employmentItem._id);
@@ -142,10 +150,15 @@ const deleteEmploymentItem = async (req, res, next) => {
       .exec();
 
     if (!employment) {
-      throw new Http404Error("Employment data not found");
+      throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.NOT_FOUND);
     }
 
-    res.status(200).json({ employment, successMessage: "Employment Removed" });
+    res
+      .status(200)
+      .json({
+        employment,
+        successMessage: ALERTS.EMPLOYMENT.SUCCESS.ITEM_REMOVED,
+      });
   } catch (error) {
     next(error);
   }

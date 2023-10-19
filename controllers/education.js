@@ -85,7 +85,7 @@ const updateEducationItem = async (req, res, next) => {
 
     res.status(201).json({
       education,
-      successMessage: ALERTS.EDUCATION.SUCCESS.ITEM_UPDATED,
+      successMessage: ALERTS.EDUCATION.SUCCESS.UPDATED,
     });
   } catch (error) {
     next(error);
@@ -120,7 +120,7 @@ const bulkUpdateEducationItems = async (req, res, next) => {
 
     res.status(201).json({
       education,
-      successMessage: ALERTS.EDUCATION.SUCCESS.ITEM_UPDATED,
+      successMessage: ALERTS.EDUCATION.SUCCESS.ITEMS_UPDATED,
     });
   } catch (error) {
     next(error);

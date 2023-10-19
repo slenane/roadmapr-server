@@ -21,23 +21,17 @@ const register = async (req, res, next) => {
   try {
     if (!req.body) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-    if (!req.body.username || !req.body.email || !req.body.password) {
+    } else if (!req.body.username || !req.body.email || !req.body.password) {
       throw new Http400Error(ALERTS.MISSING_FIELDS);
-    }
-    if (req.body.username.length < 2) {
+    } else if (req.body.username.length < 2) {
       throw new Http400Error(ALERTS.AUTH.ERROR.USERNAME_INVALID);
-    }
-    if (await User.exists({ username: req.body.username })) {
+    } else if (await User.exists({ username: req.body.username })) {
       throw new Http400Error(ALERTS.AUTH.ERROR.USERNAME_USED);
-    }
-    if (!emailRegex.test(req.body.email)) {
+    } else if (!emailRegex.test(req.body.email)) {
       throw new Http400Error(ALERTS.AUTH.ERROR.EMAIL_INVALID);
-    }
-    if (await User.exists({ email: req.body.email })) {
+    } else if (await User.exists({ email: req.body.email })) {
       throw new Http400Error(ALERTS.AUTH.ERROR.EMAIL_USED);
-    }
-    if (!validPasswordRegex.test(req.body.password)) {
+    } else if (!validPasswordRegex.test(req.body.password)) {
       throw new Http400Error(ALERTS.AUTH.ERROR.PASSWORD_INVALID);
     }
 
@@ -77,7 +71,7 @@ const register = async (req, res, next) => {
     // Handle promise's fulfilled/rejected states
     sendPromise
       .then((data) => {
-        res.status(200).json({ messageSuccess: data.MessageId });
+        res.status(200).json({ successMessage: data.MessageId });
       })
       .catch((error) => {
         next(error);
@@ -110,9 +104,7 @@ const login = (req, res, next) => {
     try {
       if (err) {
         throw new Http500Error(err.message);
-      }
-
-      if (!user) {
+      } else if (!user) {
         throw new Http404Error(ALERTS.AUTH.ERROR.USERNAME_PASSWORD_INVALID);
       }
 
@@ -289,7 +281,7 @@ const getGithubUser = async (req, res, next) => {
   }
 };
 
-const updateGithubExistingUser = (req, res) => {
+const updateGithubExistingUser = (req, res, next) => {
   try {
     if (!req.session.token) {
       throw new Http500Error(ALERTS.AUTH.ERROR.TOKEN_NOT_PROVIDED);

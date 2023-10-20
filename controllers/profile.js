@@ -63,10 +63,45 @@ const updateProfileImage = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ user, successMessage: ALERTS.PROFILE.SUCCESS.IMAGE_UPDATED });
+      .json({
+        user,
+        successMessage: ALERTS.PROFILE.SUCCESS.PROFILE_IMAGE_UPDATED,
+      });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { getProfile, updateProfile, updateProfileImage };
+const updateCoverImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      throw new Http400Error(ALERTS.PROFILE.ERROR.FILE_NOT_PROVIDED);
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.auth._id,
+      { coverImage: req.file.location },
+      { new: true }
+    );
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    res
+      .status(200)
+      .json({
+        user,
+        successMessage: ALERTS.PROFILE.SUCCESS.COVER_IMAGE_UPDATED,
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getProfile,
+  updateProfile,
+  updateProfileImage,
+  updateCoverImage,
+};

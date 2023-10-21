@@ -26,8 +26,14 @@ const userSchema = new Schema({
   },
   languagesSpoken: [
     {
-      language: String,
-      level: String,
+      language: {
+        id: String,
+        name: String,
+      },
+      level: {
+        id: String,
+        name: String,
+      },
     },
   ],
   links: {
@@ -37,21 +43,33 @@ const userSchema = new Schema({
     twitter: String,
     linkedIn: String,
   },
-  location: String,
+  location: {
+    id: String,
+    name: String,
+  },
   firstName: String,
   lastName: String,
-  nationality: String,
+  nationality: {
+    id: String,
+    name: String,
+  },
   notifications: Boolean,
   preferredLanguage: "en" | "es" | "pt",
   previousEducation: [
     {
       school: String,
       subject: String,
-      level: String,
+      level: {
+        id: String,
+        name: String,
+      },
     },
   ],
   profileImage: String,
-  path: String,
+  path: {
+    id: Number,
+    name: String,
+  },
   stack: Array,
   theme: "light" | "dark",
   username: {

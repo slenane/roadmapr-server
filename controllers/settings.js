@@ -19,7 +19,10 @@ const getSettings = async (req, res, next) => {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
+    console.log(user);
     const settings = extractSettings(user);
+
+    console.log(settings);
 
     res.status(200).json(settings);
   } catch (error) {
@@ -134,6 +137,7 @@ const extractSettings = (user) => {
     theme: user.theme,
     userId: user._id,
     username: user.username,
+    hasPassword: user.hash && user.salt ? true : false,
   };
 };
 

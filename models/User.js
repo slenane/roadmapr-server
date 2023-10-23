@@ -24,8 +24,8 @@ const userSchema = new Schema({
     username: String,
   },
   interests: {
-    professional_interests: Array,
-    personal_interests: Array,
+    professionalInterests: Array,
+    personalInterests: Array,
   },
   languagesSpoken: [
     {
@@ -131,8 +131,8 @@ module.exports = mongoose.model("User", userSchema);
 //     username: "",
 //   },
 //   interests: {
-//     professional_interests: [],
-//     personal_interests: [],
+//     professionalInterests: [],
+//     personalInterests: [],
 //   },
 //   languagesSpoken: [],
 //   links: {

@@ -14,8 +14,11 @@ const userSchema = new Schema({
     required: true,
     match: emailRegex,
   },
-  emailToken: String,
-  isVerified: Boolean,
+  emailVerification: {
+    emailToken: String,
+    isVerified: Boolean,
+    updatedEmail: String,
+  },
   github: {
     id: String,
     username: String,

@@ -73,10 +73,8 @@ const updateEmail = async (req, res, next) => {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
-    user.emailVerification = {
-      emailToken: crypto.randomBytes(64).toString("hex"),
-      updatedEmail: req.body.email,
-    };
+    user.emailVerification.emailToken = crypto.randomBytes(64).toString("hex");
+    user.emailVerification.updatedEmail = req.body.email;
 
     await user.save();
 
@@ -117,10 +115,8 @@ const verifyEmailUpdate = async (req, res) => {
     }
 
     user.email = user.emailVerification.updatedEmail;
-    user.emailVerification = {
-      emailToken: null,
-      updatedEmail: null,
-    };
+    user.emailVerification.emailToken = null;
+    user.emailVerification.updatedEmail = null;
 
     await user.save();
 

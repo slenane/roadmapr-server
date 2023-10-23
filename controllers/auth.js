@@ -94,10 +94,8 @@ const verifyEmail = async (req, res) => {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
-    user.emailVerification = {
-      emailToken: null,
-      isVerified: true,
-    };
+    user.emailVerification.emailToken = null;
+    user.emailVerification.isVerified = true;
     await user.save();
 
     res.redirect("http://localhost:4200/login?verified=true");

@@ -39,7 +39,10 @@ const register = async (req, res, next) => {
       preferredLanguage: "en",
       theme: "dark",
       email: req.body.email,
-      emailToken: crypto.randomBytes(64).toString("hex"),
+      emailVerification: {
+        emailToken: crypto.randomBytes(64).toString("hex"),
+        isVerified: false,
+      },
       username: req.body.username,
     });
 
@@ -59,7 +62,7 @@ const register = async (req, res, next) => {
     await user.save();
 
     // Create the promise and SES service object
-    const verificationLink = `http://${req.headers.host}/auth/verify-email?token=${user.emailToken}`;
+    const verificationLink = `http://${req.headers.host}/api/auth/verify-email?token=${user.emailVerification.emailToken}`;
     const verificationEmail = getVerificationEmail(
       req.body.email,
       verificationLink
@@ -83,14 +86,18 @@ const register = async (req, res, next) => {
 
 const verifyEmail = async (req, res) => {
   try {
-    const user = await User.findOne({ emailToken: req.query.token });
+    const user = await User.findOne({
+      "emailVerification.emailToken": req.query.token,
+    });
 
     if (!user) {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
-    user.emailToken = null;
-    user.isVerified = true;
+    user.emailVerification = {
+      emailToken: null,
+      isVerified: true,
+    };
     await user.save();
 
     res.redirect("http://localhost:4200/login?verified=true");
@@ -106,6 +113,10 @@ const login = (req, res, next) => {
         throw new Http500Error(err.message);
       } else if (!user) {
         throw new Http404Error(ALERTS.AUTH.ERROR.USERNAME_PASSWORD_INVALID);
+      }
+
+      if (!user.emailVerification.isVerified) {
+        throw new Http400Error(ALERTS.AUTH.ERROR.EMAIL_NOT_VERIFIED);
       }
 
       const token = user.generateJwt();

@@ -10,6 +10,11 @@ const Http500Error = require("../utils/errorHandling/http500Error.js");
 const Http404Error = require("../utils/errorHandling/http404Error.js");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
 const ALERTS = require("../utils/alerts.js");
+const config = require("../config");
+const crypto = require("crypto");
+const { getEmailUpdateVerification } = require("../utils/amazonSes");
+const AWS = require("aws-sdk");
+AWS.config.update({ region: config.AWS_BUCKET_REGION });
 
 const getSettings = async (req, res, next) => {
   try {
@@ -19,10 +24,7 @@ const getSettings = async (req, res, next) => {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
-    console.log(user);
     const settings = extractSettings(user);
-
-    console.log(settings);
 
     res.status(200).json(settings);
   } catch (error) {
@@ -54,6 +56,75 @@ const updateSettings = async (req, res, next) => {
     res
       .status(200)
       .json({ settings, successMessage: ALERTS.SETTINGS.SUCCESS.UPDATED });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateEmail = async (req, res, next) => {
+  try {
+    if (!req.body.email) {
+      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
+    }
+
+    const user = await User.findById(req.auth._id);
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    user.emailVerification = {
+      emailToken: crypto.randomBytes(64).toString("hex"),
+      updatedEmail: req.body.email,
+    };
+
+    await user.save();
+
+    // Create the promise and SES service object
+    const verificationLink = `http://${req.headers.host}/api/settings/verify-email-update?token=${user.emailVerification.emailToken}`;
+    const verificationEmail = getEmailUpdateVerification(
+      user.emailVerification.updatedEmail,
+      verificationLink
+    );
+    const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
+      .sendEmail(verificationEmail)
+      .promise();
+
+    // Handle promise's fulfilled/rejected states
+    sendPromise
+      .then((data) => {
+        res.status(200).json({
+          successMessage: ALERTS.AUTH.SUCCESS.EMAIL_VERIFICATION,
+          successValue: user.emailVerification.updatedEmail,
+        });
+      })
+      .catch((error) => {
+        next(error);
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const verifyEmailUpdate = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      "emailVerification.emailToken": req.query.token,
+    });
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    user.email = user.emailVerification.updatedEmail;
+    user.emailVerification = {
+      emailToken: null,
+      updatedEmail: null,
+    };
+
+    await user.save();
+
+    res.redirect("http://localhost:4200/login?verified=true");
   } catch (error) {
     next(error);
   }
@@ -138,7 +209,15 @@ const extractSettings = (user) => {
     userId: user._id,
     username: user.username,
     hasPassword: user.hash && user.salt ? true : false,
+    emailUpdatePending: user.emailVerification?.updatedEmail,
   };
 };
 
-module.exports = { getSettings, updateSettings, updatePassword, deleteAccount };
+module.exports = {
+  getSettings,
+  updateSettings,
+  updateEmail,
+  verifyEmailUpdate,
+  updatePassword,
+  deleteAccount,
+};

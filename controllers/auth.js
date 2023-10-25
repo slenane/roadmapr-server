@@ -6,7 +6,10 @@ const User = require("../models/User.js");
 const Education = require("../models/education/Education.js");
 const Employment = require("../models/employment/Employment.js");
 const Projects = require("../models/projects/Projects.js");
-const { getVerificationEmail } = require("../utils/amazonSes");
+const {
+  getVerificationEmail,
+  getPasswordResetEmail,
+} = require("../utils/amazonSes");
 const AWS = require("aws-sdk");
 AWS.config.update({ region: config.AWS_BUCKET_REGION });
 const Http400Error = require("../utils/errorHandling/http400Error");
@@ -125,13 +128,52 @@ const login = (req, res, next) => {
   })(req, res, next);
 };
 
+const sendResetPasswordEmail = async (req, res, next) => {
+  try {
+    if (!req.params.email) {
+      throw new Http400Error("Email not provided");
+    }
+
+    const user = await User.exists({ email: req.params.email });
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    user.emailVerification.emailResetPasswordToken = crypto
+      .randomBytes(64)
+      .toString("hex");
+    await user.save();
+
+    // Create the promise and SES service object
+    const verificationLink = `http://${req.headers.host}/api/auth/reset-password?token=${user.emailVerification.emailResetPasswordToken}`;
+    const verificationEmail = getPasswordResetEmail(
+      req.params.email,
+      verificationLink
+    );
+    const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
+      .sendEmail(verificationEmail)
+      .promise();
+
+    // Handle promise's fulfilled/rejected states
+    sendPromise
+      .then((data) => {
+        res.status(200).json({ successMessage: data.MessageId });
+      })
+      .catch((error) => {
+        next(error);
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const isUniqueUsername = async (req, res, next) => {
   try {
     if (!req.params.username) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const user = await User.exists({ username: req.params.username });
+    const user = await User.exists({ email: req.params.email });
 
     if (user) res.status(200).json({ notUnique: true });
     else res.status(200).json(null);
@@ -353,6 +395,7 @@ module.exports = {
   register,
   verifyEmail,
   login,
+  sendResetPasswordEmail,
   isUniqueUsername,
   isUniqueEmail,
   authPage,

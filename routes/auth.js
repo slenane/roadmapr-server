@@ -3,6 +3,7 @@ const {
   register,
   verifyEmail,
   login,
+  sendResetPasswordEmail,
   isUniqueUsername,
   isUniqueEmail,
   authPage,
@@ -17,6 +18,8 @@ const router = express.Router();
 router.post("/register", register);
 router.get("/verify-email", verifyEmail);
 router.post("/login", login);
+router.get("/send-reset-password-email/:email", sendResetPasswordEmail);
+router.get("/reset-password", sendResetPasswordEmail);
 router.get("/unique-username/:username", isUniqueUsername);
 router.get("/unique-email/:email", isUniqueEmail);
 router.get("/github/auth-page", authPage);

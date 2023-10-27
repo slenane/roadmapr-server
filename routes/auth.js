@@ -4,6 +4,8 @@ const {
   verifyEmail,
   login,
   sendResetPasswordEmail,
+  verifyPasswordReset,
+  resetPassword,
   isUniqueUsername,
   isUniqueEmail,
   authPage,
@@ -19,7 +21,8 @@ router.post("/register", register);
 router.get("/verify-email", verifyEmail);
 router.post("/login", login);
 router.get("/send-reset-password-email/:email", sendResetPasswordEmail);
-router.get("/reset-password", sendResetPasswordEmail);
+router.get("/verify-reset-password", verifyPasswordReset);
+router.patch("/reset-password", resetPassword);
 router.get("/unique-username/:username", isUniqueUsername);
 router.get("/unique-email/:email", isUniqueEmail);
 router.get("/github/auth-page", authPage);

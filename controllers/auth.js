@@ -134,7 +134,7 @@ const sendResetPasswordEmail = async (req, res, next) => {
       throw new Http400Error("Email not provided");
     }
 
-    const user = await User.exists({ email: req.params.email });
+    const user = await User.findOne({ email: req.params.email });
     if (!user) {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
@@ -145,7 +145,7 @@ const sendResetPasswordEmail = async (req, res, next) => {
     await user.save();
 
     // Create the promise and SES service object
-    const verificationLink = `http://${req.headers.host}/api/auth/reset-password?token=${user.emailVerification.emailResetPasswordToken}`;
+    const verificationLink = `http://${req.headers.host}/api/auth/verify-reset-password?token=${user.emailVerification.emailResetPasswordToken}`;
     const verificationEmail = getPasswordResetEmail(
       req.params.email,
       verificationLink
@@ -162,6 +162,51 @@ const sendResetPasswordEmail = async (req, res, next) => {
       .catch((error) => {
         next(error);
       });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const verifyPasswordReset = async (req, res, next) => {
+  try {
+    const user = await User.exists({
+      "emailVerification.emailResetPasswordToken": req.query.token,
+    });
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+    res.redirect(
+      `http://localhost:4200/reset-password?token=${user.emailVerification.emailResetPasswordToken}`
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    if (!req.params.token) {
+      throw new Http400Error("Valid token not provided");
+    }
+
+    if (!req.params.password) {
+      throw new Http400Error("Password not provided");
+    }
+
+    const user = await User.exists({
+      "emailVerification.emailResetPasswordToken": req.body.token,
+    });
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    user.emailVerification.emailResetPasswordToken = null;
+    await user.setPassword(req.body.password);
+    await user.save();
+
+    res.redirect("http://localhost:4200/login?verified=true");
   } catch (error) {
     next(error);
   }
@@ -396,6 +441,8 @@ module.exports = {
   verifyEmail,
   login,
   sendResetPasswordEmail,
+  verifyPasswordReset,
+  resetPassword,
   isUniqueUsername,
   isUniqueEmail,
   authPage,

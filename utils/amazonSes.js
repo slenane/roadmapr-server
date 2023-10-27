@@ -110,7 +110,7 @@ const getVerificationEmail = (userEmail, verificationLink) => {
           Data: `
               Welcome to roadmapr
               Thank you for registering with roadmapr, where you can create your own personal roadmap to a career in software development.
-              Please copy and paste the text below to your browser to verify your email address.
+              Please copy and paste the text below to your browser to verify your email.
               
               ${verificationLink}
 
@@ -122,7 +122,7 @@ const getVerificationEmail = (userEmail, verificationLink) => {
       },
       Subject: {
         Charset: "UTF-8",
-        Data: "Welcome to roadmapr - Verify your email address",
+        Data: "Welcome to roadmapr - Verify your email",
       },
     },
     Source: config.EMAIL_ADDRESS,
@@ -174,13 +174,13 @@ const getPasswordResetEmail = (userEmail, verificationLink) => {
                   alt="logo"
                 />
             
-                <h1>Verify Email Update</h1>
+                <h1>Reset Password</h1>
             </header> 
         
             <main>
-                <p>A request has been made to set this email address as the primary email for a roadmapr user.</p>
+                <p>A request has been made to reset your roadmapr password.</p>
         
-                <p>Click the button below to verify your email address.</p>
+                <p>Click the button below to verify your email and set a new password.</p>
             
                 <a href="${verificationLink}">
                   <button class="verify-button">Verify Email</button>
@@ -200,9 +200,9 @@ const getPasswordResetEmail = (userEmail, verificationLink) => {
         Text: {
           Charset: "UTF-8",
           Data: `
-              Verify Email Update
-              A request has been made to set this email address as the primary email for a roadmapr user.
-              Please copy and paste the text below to your browser to verify your email address.
+          Reset Password
+          A request has been made to reset your roadmapr password.
+              Please copy and paste the text below to your browser to verify your email and set a new password.
               
               ${verificationLink}
 
@@ -214,7 +214,7 @@ const getPasswordResetEmail = (userEmail, verificationLink) => {
       },
       Subject: {
         Charset: "UTF-8",
-        Data: "roadmapr - Verify email update",
+        Data: "roadmapr - Reset password",
       },
     },
     Source: config.EMAIL_ADDRESS,

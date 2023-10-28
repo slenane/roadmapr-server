@@ -1,5 +1,7 @@
 const config = require("../config");
 
+const API_VERSION = { apiVersion: "2010-12-01" };
+
 const defaultMail = {
   Destination: {
     /* required */
@@ -314,6 +316,7 @@ const getEmailUpdateVerification = (userEmail, verificationLink) => {
 };
 
 module.exports = {
+  API_VERSION,
   getVerificationEmail,
   getPasswordResetEmail,
   getEmailUpdateVerification,

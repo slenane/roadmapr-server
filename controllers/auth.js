@@ -7,6 +7,7 @@ const Education = require("../models/education/Education.js");
 const Employment = require("../models/employment/Employment.js");
 const Projects = require("../models/projects/Projects.js");
 const {
+  API_VERSION,
   getVerificationEmail,
   getPasswordResetEmail,
 } = require("../utils/amazonSes");
@@ -70,7 +71,7 @@ const register = async (req, res, next) => {
       req.body.email,
       verificationLink
     );
-    const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
+    const sendPromise = new AWS.SES(API_VERSION)
       .sendEmail(verificationEmail)
       .promise();
 
@@ -131,7 +132,7 @@ const login = (req, res, next) => {
 const sendResetPasswordEmail = async (req, res, next) => {
   try {
     if (!req.params.email) {
-      throw new Http400Error("Email not provided");
+      throw new Http400Error(ALERTS.AUTH.ERROR.EMAIL_NOT_PROVIDED);
     }
 
     const user = await User.findOne({ email: req.params.email });
@@ -150,7 +151,7 @@ const sendResetPasswordEmail = async (req, res, next) => {
       req.params.email,
       verificationLink
     );
-    const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
+    const sendPromise = new AWS.SES(API_VERSION)
       .sendEmail(verificationEmail)
       .promise();
 
@@ -187,11 +188,11 @@ const verifyPasswordReset = async (req, res, next) => {
 const resetPassword = async (req, res, next) => {
   try {
     if (!req.body.token) {
-      throw new Http400Error("Valid token not provided");
+      throw new Http400Error(ALERTS.AUTH.ERROR.TOKEN_NOT_PROVIDED);
     }
 
     if (!req.body.password) {
-      throw new Http400Error("Password not provided");
+      throw new Http400Error(ALERTS.AUTH.ERROR.PASSWORD_NOT_PROVIDED);
     }
 
     const user = await User.findOne({
@@ -206,7 +207,9 @@ const resetPassword = async (req, res, next) => {
     await user.setPassword(req.body.password);
     await user.save();
 
-    res.status(200).json({ successMessage: "Password Updated" });
+    res
+      .status(200)
+      .json({ successMessage: ALERTS.AUTH.SUCCESS.PASSWORD_UPDATED });
   } catch (error) {
     next(error);
   }

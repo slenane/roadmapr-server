@@ -169,7 +169,7 @@ const sendResetPasswordEmail = async (req, res, next) => {
 
 const verifyPasswordReset = async (req, res, next) => {
   try {
-    const user = await User.exists({
+    const user = await User.findOne({
       "emailVerification.emailResetPasswordToken": req.query.token,
     });
 
@@ -186,15 +186,15 @@ const verifyPasswordReset = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   try {
-    if (!req.params.token) {
+    if (!req.body.token) {
       throw new Http400Error("Valid token not provided");
     }
 
-    if (!req.params.password) {
+    if (!req.body.password) {
       throw new Http400Error("Password not provided");
     }
 
-    const user = await User.exists({
+    const user = await User.findOne({
       "emailVerification.emailResetPasswordToken": req.body.token,
     });
 
@@ -206,7 +206,7 @@ const resetPassword = async (req, res, next) => {
     await user.setPassword(req.body.password);
     await user.save();
 
-    res.redirect("http://localhost:4200/login?verified=true");
+    res.status(200).json({ successMessage: "Password Updated" });
   } catch (error) {
     next(error);
   }

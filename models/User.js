@@ -15,6 +15,7 @@ const userSchema = new Schema({
     match: emailRegex,
   },
   emailVerification: {
+    emailResetPasswordToken: String,
     emailToken: String,
     isVerified: Boolean,
     updatedEmail: String,

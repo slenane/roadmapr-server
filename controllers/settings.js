@@ -152,6 +152,38 @@ const updatePassword = async (req, res, next) => {
   }
 };
 
+const updateExistingPassword = async (req, res, next) => {
+  try {
+    if (!req.body.current) {
+      throw new Http400Error(ALERTS.SETTINGS.ERROR.CURRENT_PASSWORD_REQUIRED);
+    } else if (!req.body.new) {
+      throw new Http400Error(ALERTS.SETTINGS.ERROR.NEW_PASSWORD_REQUIRED);
+    } else if (req.body.current === req.body.new) {
+      throw new Http400Error(ALERTS.SETTINGS.ERROR.PASSWORDS_MATCH);
+    }
+
+    const user = await User.findById(req.auth._id);
+    if (!user) throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+
+    const currentPasswordValid = await user.validPassword(req.body.current);
+    if (!currentPasswordValid) {
+      throw new Http400Error(ALERTS.SETTINGS.ERROR.CURRENT_PASSWORD_INCORRECT);
+    }
+
+    await user.setPassword(req.body.new);
+    await user.save();
+
+    const settings = extractSettings(user);
+
+    res.status(200).json({
+      settings,
+      successMessage: ALERTS.SETTINGS.SUCCESS.PASSWORD_UPDATED,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const deleteAccount = async (req, res, next) => {
   const userId = req.auth._id;
 
@@ -215,5 +247,6 @@ module.exports = {
   updateEmail,
   verifyEmailUpdate,
   updatePassword,
+  updateExistingPassword,
   deleteAccount,
 };

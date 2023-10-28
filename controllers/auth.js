@@ -6,7 +6,11 @@ const User = require("../models/User.js");
 const Education = require("../models/education/Education.js");
 const Employment = require("../models/employment/Employment.js");
 const Projects = require("../models/projects/Projects.js");
-const { getVerificationEmail } = require("../utils/amazonSes");
+const {
+  API_VERSION,
+  getVerificationEmail,
+  getPasswordResetEmail,
+} = require("../utils/amazonSes");
 const AWS = require("aws-sdk");
 AWS.config.update({ region: config.AWS_BUCKET_REGION });
 const Http400Error = require("../utils/errorHandling/http400Error");
@@ -67,7 +71,7 @@ const register = async (req, res, next) => {
       req.body.email,
       verificationLink
     );
-    const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
+    const sendPromise = new AWS.SES(API_VERSION)
       .sendEmail(verificationEmail)
       .promise();
 
@@ -125,13 +129,99 @@ const login = (req, res, next) => {
   })(req, res, next);
 };
 
+const sendResetPasswordEmail = async (req, res, next) => {
+  try {
+    if (!req.params.email) {
+      throw new Http400Error(ALERTS.AUTH.ERROR.EMAIL_NOT_PROVIDED);
+    }
+
+    const user = await User.findOne({ email: req.params.email });
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    user.emailVerification.emailResetPasswordToken = crypto
+      .randomBytes(64)
+      .toString("hex");
+    await user.save();
+
+    // Create the promise and SES service object
+    const verificationLink = `http://${req.headers.host}/api/auth/verify-reset-password?token=${user.emailVerification.emailResetPasswordToken}`;
+    const verificationEmail = getPasswordResetEmail(
+      req.params.email,
+      verificationLink
+    );
+    const sendPromise = new AWS.SES(API_VERSION)
+      .sendEmail(verificationEmail)
+      .promise();
+
+    // Handle promise's fulfilled/rejected states
+    sendPromise
+      .then((data) => {
+        res.status(200).json({ successMessage: data.MessageId });
+      })
+      .catch((error) => {
+        next(error);
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const verifyPasswordReset = async (req, res, next) => {
+  try {
+    const user = await User.findOne({
+      "emailVerification.emailResetPasswordToken": req.query.token,
+    });
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+    res.redirect(
+      `http://localhost:4200/reset-password?token=${user.emailVerification.emailResetPasswordToken}`
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    if (!req.body.token) {
+      throw new Http400Error(ALERTS.AUTH.ERROR.TOKEN_NOT_PROVIDED);
+    }
+
+    if (!req.body.password) {
+      throw new Http400Error(ALERTS.AUTH.ERROR.PASSWORD_NOT_PROVIDED);
+    }
+
+    const user = await User.findOne({
+      "emailVerification.emailResetPasswordToken": req.body.token,
+    });
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    user.emailVerification.emailResetPasswordToken = null;
+    await user.setPassword(req.body.password);
+    await user.save();
+
+    res
+      .status(200)
+      .json({ successMessage: ALERTS.AUTH.SUCCESS.PASSWORD_UPDATED });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const isUniqueUsername = async (req, res, next) => {
   try {
     if (!req.params.username) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const user = await User.exists({ username: req.params.username });
+    const user = await User.exists({ email: req.params.email });
 
     if (user) res.status(200).json({ notUnique: true });
     else res.status(200).json(null);
@@ -353,6 +443,9 @@ module.exports = {
   register,
   verifyEmail,
   login,
+  sendResetPasswordEmail,
+  verifyPasswordReset,
+  resetPassword,
   isUniqueUsername,
   isUniqueEmail,
   authPage,

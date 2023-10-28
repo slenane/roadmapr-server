@@ -16,6 +16,11 @@ const educationItemSchema = Schema({
   status: "todo" | "inProgress" | "done",
   position: Number,
   type: String,
+  metadata: {
+    provider: String,
+    title: String,
+    isbn: String,
+  },
   education: {
     type: Schema.Types.ObjectId,
     ref: "Education",

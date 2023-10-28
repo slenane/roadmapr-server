@@ -3,6 +3,9 @@ const Education = require("../models/education/Education.js");
 const EducationItem = require("../models/education/EducationItem.js");
 const Http404Error = require("../utils/errorHandling/http404Error");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
+const {
+  generateEducationItemMetadata,
+} = require("../utils/educationMetadata.js");
 // const fetchEducationItem = require("../utils/fetchEducationItem.js");
 const ALERTS = require("../utils/alerts.js");
 
@@ -34,6 +37,9 @@ const createEducationItem = async (req, res, next) => {
       education: req.params.id,
     });
 
+    educationItem.metadata = generateEducationItemMetadata(educationItem.link);
+    console.log(educationItem).metadata;
+
     await educationItem.save();
 
     const education = await Education.findById(educationItem.education)
@@ -64,6 +70,13 @@ const updateEducationItem = async (req, res, next) => {
 
     const educationItem = req.body.data;
     const id = req.body.data._id;
+
+    if (educationItem.link) {
+      educationItem.metadata = generateEducationItemMetadata(
+        educationItem.link
+      );
+      console.log(educationItem.metadata);
+    }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Http404Error(ALERTS.EDUCATION.ERROR.ITEM_NOT_FOUND);

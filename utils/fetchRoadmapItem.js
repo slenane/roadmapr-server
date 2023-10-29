@@ -6,10 +6,6 @@
 //   "Books",
 //   "Course",
 //   "Courses",
-//   "Degree",
-//   "Degrees",
-//   "Tutorial",
-//   "Tutorials",
 // ];
 
 // const parseDescriptionForStack = (text) => {

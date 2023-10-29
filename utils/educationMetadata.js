@@ -74,6 +74,7 @@ const generateEducationItemMetadata = (link) => {
 };
 
 const hasMetadata = (item) => {
+  if (!item) return false;
   if (!item.provider || !item.provider.length) return false;
   else if (!item.title || !item.title.length) return false;
   else return true;

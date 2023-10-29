@@ -5,7 +5,13 @@ const Http404Error = require("../utils/errorHandling/http404Error");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
 const {
   generateEducationItemMetadata,
+  hasMetadata,
+  metadataUpdateRequired,
 } = require("../utils/educationMetadata.js");
+const {
+  updateEducationRecommendation,
+  removeEducationRecommendation,
+} = require("./recommendation.js");
 // const fetchEducationItem = require("../utils/fetchEducationItem.js");
 const ALERTS = require("../utils/alerts.js");
 
@@ -38,7 +44,14 @@ const createEducationItem = async (req, res, next) => {
     });
 
     educationItem.metadata = generateEducationItemMetadata(educationItem.link);
-    console.log(educationItem).metadata;
+    if (educationItem.metadata) {
+      await updateEducationRecommendation(
+        req.session.user,
+        educationItem.metadata,
+        educationItem.isRecommended,
+        next
+      );
+    }
 
     await educationItem.save();
 
@@ -68,25 +81,53 @@ const updateEducationItem = async (req, res, next) => {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const educationItem = req.body.data;
+    let educationItem = req.body.data;
     const id = req.body.data._id;
-
-    if (educationItem.link) {
-      educationItem.metadata = generateEducationItemMetadata(
-        educationItem.link
-      );
-      console.log(educationItem.metadata);
-    }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Http404Error(ALERTS.EDUCATION.ERROR.ITEM_NOT_FOUND);
     }
 
-    await EducationItem.findByIdAndUpdate(
+    educationItem = await EducationItem.findByIdAndUpdate(
       id,
       { ...educationItem, id },
       { new: true }
     );
+
+    if (hasMetadata(educationItem.metadata)) {
+      const updatedMetadata = generateEducationItemMetadata(educationItem.link);
+
+      if (metadataUpdateRequired(educationItem.metadata, updatedMetadata)) {
+        await removeEducationRecommendation(
+          req.session.user,
+          educationItem.metadata,
+          educationItem.isRecommended,
+          next
+        );
+
+        await updateEducationRecommendation(
+          req.session.user,
+          updatedMetadata,
+          educationItem.isRecommended,
+          next
+        );
+      }
+    } else {
+      educationItem.metadata = await generateEducationItemMetadata(
+        educationItem.link
+      );
+
+      if (hasMetadata(educationItem.metadata)) {
+        await updateEducationRecommendation(
+          req.session.user,
+          educationItem.metadata,
+          educationItem.isRecommended,
+          next
+        );
+      }
+    }
+
+    await educationItem.save();
 
     const education = await Education.findById(educationItem.education)
       .populate("educationList")
@@ -152,6 +193,15 @@ const deleteEducationItem = async (req, res, next) => {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Http404Error(ALERTS.EDUCATION.ERROR.ITEM_NOT_FOUND);
+    }
+
+    if (hasMetadata(educationItem.metadata)) {
+      await removeEducationRecommendation(
+        req.session.user,
+        educationItem.metadata,
+        educationItem.isRecommended,
+        next
+      );
     }
 
     await EducationItem.findByIdAndRemove(educationItem._id);

@@ -1,12 +1,14 @@
 // APP SETUP
 const express = require("express");
+const session = require("express-session");
+const User = require("./models/User");
+const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const config = require("./config");
-const cookieSession = require("cookie-session");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const {
@@ -63,11 +65,33 @@ app.use(
 );
 app.use(
   cookieSession({
-    name: "github-session", //name of the cookie containing access token in the //browser
+    name: "github-session", // name of the cookie containing access token in the //browser
     secret: process.env.DB_SECRET,
     httpOnly: true,
   })
 );
+app.use(
+  session({
+    secret: config.DB_SECRET, // You should use a secure, random secret in production
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+app.use(async (req, res, next) => {
+  if (!req.session.user) {
+    const userId = req.session.userId;
+
+    if (userId) {
+      try {
+        const user = await User.findById(userId);
+        req.session.user = user; // Store user information in the session
+      } catch (error) {
+        next(error);
+      }
+    }
+  }
+  next();
+});
 
 // ROUTES
 app.use("/api/auth", authRoutes);

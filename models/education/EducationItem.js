@@ -6,6 +6,7 @@ const educationItemSchema = Schema({
   title: String,
   startDate: { type: Date, required: false },
   endDate: { type: Date, required: false },
+  isRecommended: { type: Boolean, default: true },
   author: String,
   provider: String,
   link: String,

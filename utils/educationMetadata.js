@@ -50,7 +50,7 @@ const isbnRegex = {
 
 const generateEducationItemMetadata = (link) => {
   let provider, title, isbn;
-  console.log(providerRegex);
+
   for (const regex in providerRegex) {
     if (new RegExp(providerRegex[regex]).test(link)) {
       provider = providerRegex[regex];
@@ -58,21 +58,12 @@ const generateEducationItemMetadata = (link) => {
     }
   }
   if (provider) {
-    console.log(provider);
-    console.log(titleRegex[provider]);
     const match = link.match(titleRegex[provider]);
-    console.log(match);
-    if (match) {
-      title = match[1];
-    }
+    if (match) title = match[1];
   }
   if (provider === AMAZON) {
-    console.log(provider);
     const match = link.match(isbnRegex[provider]);
-    console.log(match);
-    if (match) {
-      isbn = match[1];
-    }
+    if (match) isbn = match[1];
   }
 
   return {
@@ -82,8 +73,22 @@ const generateEducationItemMetadata = (link) => {
   };
 };
 
+const hasMetadata = (item) => {
+  if (!item.provider || !item.provider.length) return false;
+  else if (!item.title || !item.title.length) return false;
+  else return true;
+};
+
+const metadataUpdateRequired = (initialValue, newValue) => {
+  if (initialValue.provider !== newValue.provider) return true;
+  else if (initialValue.title !== newValue.title) return true;
+  else return false;
+};
+
 module.exports = {
   generateEducationItemMetadata,
+  hasMetadata,
+  metadataUpdateRequired,
 };
 
 // // AMAZON

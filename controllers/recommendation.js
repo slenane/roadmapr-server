@@ -13,17 +13,13 @@ const updateEducationRecommendation = async (
   next
 ) => {
   try {
-    if (!data.provider) {
-      throw new Http400Error("Provider not found");
-    }
-    if (!data.title) {
-      throw new Http400Error("Title not found");
-    }
-    if (data.provider === "amazon" && !data.isbn) {
-      throw new Http400Error("ISBN not found");
-    }
-    if (!user) {
-      throw new Http400Error("User not found");
+    if (
+      !data.provider ||
+      !data.title ||
+      (data.provider === "amazon" && !data.isbn) ||
+      !user
+    ) {
+      return;
     }
 
     let recommendation = await Recommendation.findOne({
@@ -76,17 +72,13 @@ const removeEducationRecommendation = async (
   next
 ) => {
   try {
-    if (!data.provider) {
-      throw new Http400Error("Provider not found");
-    }
-    if (!data.title) {
-      throw new Http400Error("Title not found");
-    }
-    if (data.provider === "amazon" && !data.isbn) {
-      throw new Http400Error("ISBN not found");
-    }
-    if (!user) {
-      throw new Http400Error("User not found");
+    if (
+      !data.provider ||
+      !data.title ||
+      (data.provider === "amazon" && !data.isbn) ||
+      !user
+    ) {
+      return;
     }
 
     const recommendation = await Recommendation.findOne({

@@ -68,7 +68,10 @@ const createEducationItem = async (req, res, next) => {
 
     res.status(200).json({
       education,
-      successMessage: ALERTS.EDUCATION.SUCCESS.UPDATED,
+      successMessage:
+        educationItem.type === "book"
+          ? ALERTS.EDUCATION.SUCCESS.BOOK.CREATED
+          : ALERTS.EDUCATION.SUCCESS.COURSE.CREATED,
     });
   } catch (error) {
     next(error);
@@ -85,7 +88,11 @@ const updateEducationItem = async (req, res, next) => {
     const id = req.body.data._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Http404Error(ALERTS.EDUCATION.ERROR.ITEM_NOT_FOUND);
+      throw new Http404Error(
+        educationItem.type === "book"
+          ? ALERTS.EDUCATION.ERROR.BOOK_NOT_FOUND
+          : ALERTS.EDUCATION.ERROR.COURSE_NOT_FOUND
+      );
     }
 
     educationItem = await EducationItem.findByIdAndUpdate(
@@ -139,7 +146,10 @@ const updateEducationItem = async (req, res, next) => {
 
     res.status(201).json({
       education,
-      successMessage: ALERTS.EDUCATION.SUCCESS.UPDATED,
+      successMessage:
+        educationItem.type === "book"
+          ? ALERTS.EDUCATION.SUCCESS.BOOK.UPDATED
+          : ALERTS.EDUCATION.SUCCESS.COURSE.UPDATED,
     });
   } catch (error) {
     next(error);
@@ -158,7 +168,11 @@ const bulkUpdateEducationItems = async (req, res, next) => {
       const id = item._id;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        throw new Http404Error(ALERTS.EDUCATION.ERROR.ITEM_NOT_FOUND);
+        throw new Http404Error(
+          item.type === "book"
+            ? ALERTS.EDUCATION.ERROR.BOOK_NOT_FOUND
+            : ALERTS.EDUCATION.ERROR.COURSE_NOT_FOUND
+        );
       }
 
       await EducationItem.findByIdAndUpdate(id, { ...item, id }, { new: true });
@@ -192,7 +206,11 @@ const deleteEducationItem = async (req, res, next) => {
     const id = req.body.data._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Http404Error(ALERTS.EDUCATION.ERROR.ITEM_NOT_FOUND);
+      throw new Http404Error(
+        educationItem.type === "book"
+          ? ALERTS.EDUCATION.ERROR.BOOK_NOT_FOUND
+          : ALERTS.EDUCATION.ERROR.COURSE_NOT_FOUND
+      );
     }
 
     if (hasMetadata(educationItem.metadata)) {
@@ -215,7 +233,10 @@ const deleteEducationItem = async (req, res, next) => {
     }
     res.status(200).json({
       education,
-      successMessage: ALERTS.EDUCATION.SUCCESS.ITEM_REMOVED,
+      successMessage:
+        educationItem.type === "book"
+          ? ALERTS.EDUCATION.SUCCESS.BOOK.REMOVED
+          : ALERTS.EDUCATION.SUCCESS.COURSE.REMOVED,
     });
   } catch (error) {
     next(error);

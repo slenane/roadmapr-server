@@ -48,7 +48,7 @@ const createProjectItem = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ projects, successMessage: ALERTS.PROJECTS.SUCCESS.UPDATED });
+      .json({ projects, successMessage: ALERTS.PROJECTS.SUCCESS.CREATED });
   } catch (error) {
     next(error);
   }
@@ -150,7 +150,7 @@ const deleteProjectItem = async (req, res, next) => {
 
     res.status(200).json({
       projects,
-      successMessage: ALERTS.PROJECTS.SUCCESS.ITEM_REMOVED,
+      successMessage: ALERTS.PROJECTS.SUCCESS.REMOVED,
     });
   } catch (error) {
     next(error);

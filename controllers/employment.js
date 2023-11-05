@@ -48,7 +48,7 @@ const createEmploymentItem = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ employment, successMessage: ALERTS.EMPLOYMENT.SUCCESS.UPDATED });
+      .json({ employment, successMessage: ALERTS.EMPLOYMENT.SUCCESS.CREATED });
   } catch (error) {
     next(error);
   }
@@ -119,12 +119,10 @@ const bulkUpdateEmploymentItems = async (req, res, next) => {
       throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.NOT_FOUND);
     }
 
-    res
-      .status(201)
-      .json({
-        employment,
-        successMessage: ALERTS.EMPLOYMENT.SUCCESS.ITEMS_UPDATED,
-      });
+    res.status(201).json({
+      employment,
+      successMessage: ALERTS.EMPLOYMENT.SUCCESS.ITEMS_UPDATED,
+    });
   } catch (error) {
     next(error);
   }
@@ -153,12 +151,10 @@ const deleteEmploymentItem = async (req, res, next) => {
       throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.NOT_FOUND);
     }
 
-    res
-      .status(200)
-      .json({
-        employment,
-        successMessage: ALERTS.EMPLOYMENT.SUCCESS.ITEM_REMOVED,
-      });
+    res.status(200).json({
+      employment,
+      successMessage: ALERTS.EMPLOYMENT.SUCCESS.REMOVED,
+    });
   } catch (error) {
     next(error);
   }

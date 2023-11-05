@@ -1,5 +1,11 @@
 const express = require("express");
 const {
+  getRegistrationRules,
+  getLoginRules,
+  getResetPasswordRules,
+  sanitize,
+} = require("../middleware/sanitize.js");
+const {
   register,
   verifyEmail,
   login,
@@ -17,12 +23,17 @@ const {
 
 const router = express.Router();
 
-router.post("/register", register);
+router.post("/register", getRegistrationRules(), sanitize, register);
 router.get("/verify-email", verifyEmail);
-router.post("/login", login);
+router.post("/login", getLoginRules(), sanitize, login);
 router.get("/send-reset-password-email/:email", sendResetPasswordEmail);
 router.get("/verify-reset-password", verifyPasswordReset);
-router.patch("/reset-password", resetPassword);
+router.patch(
+  "/reset-password",
+  getResetPasswordRules(),
+  sanitize,
+  resetPassword
+);
 router.get("/unique-username/:username", isUniqueUsername);
 router.get("/unique-email/:email", isUniqueEmail);
 router.get("/github/auth-page", authPage);

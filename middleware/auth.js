@@ -1,7 +1,5 @@
 const passport = require("passport");
-// const config = require("../config");
 const LocalStrategy = require("passport-local").Strategy;
-// const GitHubStrategy = require("passport-github2").Strategy;
 const User = require("../models/User.js");
 
 passport.use(

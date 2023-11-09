@@ -24,10 +24,6 @@ const getEmployment = async (req, res, next) => {
 
 const createEmploymentItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
     const employmentItem = new EmploymentItem({
       ...req.body.data,
       employment: req.params.id,
@@ -56,10 +52,6 @@ const createEmploymentItem = async (req, res, next) => {
 
 const updateEmploymentItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
     const employmentItem = req.body.data;
     const id = req.body.data._id;
 

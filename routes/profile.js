@@ -5,13 +5,8 @@ const {
   updateProfileImage,
   updateCoverImage,
 } = require("../controllers/profile.js");
-const { expressjwt: jwt } = require("express-jwt");
+const { isAuth } = require("../middleware/is-auth.js");
 const upload = require("../multerConfig.js");
-
-const isAuth = jwt({
-  secret: process.env.DB_SECRET,
-  algorithms: ["HS256"],
-});
 
 const router = express.Router();
 

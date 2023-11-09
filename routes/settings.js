@@ -8,12 +8,7 @@ const {
   updateExistingPassword,
   deleteAccount,
 } = require("../controllers/settings.js");
-const { expressjwt: jwt } = require("express-jwt");
-
-const isAuth = jwt({
-  secret: process.env.DB_SECRET,
-  algorithms: ["HS256"],
-});
+const { isAuth } = require("../middleware/is-auth.js");
 
 const router = express.Router();
 

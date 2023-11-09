@@ -40,6 +40,28 @@ const rules = {
       .matches(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/)
       .escape(),
   ],
+  employment: [
+    body("type").custom((value) => {
+      if (value !== "freelance" && value !== "employment") {
+        throw new Error(ALERTS.EMPLOYMENT.ERROR.TYPE_INVALID);
+      }
+      return true;
+    }),
+    body("company", ALERTS.EMPLOYMENT.ERROR.COMPANY_INVALID)
+      .isLength({ min: 3 })
+      .trim()
+      .escape(),
+    body("role", ALERTS.EMPLOYMENT.ERROR.ROLE_INVALID)
+      .isLength({ min: 3 })
+      .trim()
+      .escape(),
+    body("stack").custom((value) => {
+      if (!value.length) {
+        throw new Error(ALERTS.EMPLOYMENT.ERROR.STACK_INVALID);
+      }
+      return true;
+    }),
+  ],
 };
 
 const getRegistrationRules = () => {
@@ -56,6 +78,10 @@ const getResetPasswordRules = () => {
 
 const getEducationRules = () => {
   return [...rules.education];
+};
+
+const getEmploymentRules = () => {
+  return [...rules.employment];
 };
 
 const sanitize = (req, res, next) => {
@@ -77,5 +103,6 @@ module.exports = {
   getLoginRules,
   getResetPasswordRules,
   getEducationRules,
+  getEmploymentRules,
   sanitize,
 };

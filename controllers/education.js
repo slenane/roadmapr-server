@@ -34,12 +34,8 @@ const getEducation = async (req, res, next) => {
 
 const createEducationItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
     const educationItem = new EducationItem({
-      ...req.body.data,
+      ...req.body,
       education: req.params.id,
     });
 
@@ -80,12 +76,8 @@ const createEducationItem = async (req, res, next) => {
 
 const updateEducationItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
-    let educationItem = req.body.data;
-    const id = req.body.data._id;
+    let educationItem = req.body;
+    const id = req.body._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Http404Error(
@@ -158,11 +150,11 @@ const updateEducationItem = async (req, res, next) => {
 
 const bulkUpdateEducationItems = async (req, res, next) => {
   try {
-    if (!req.body.data) {
+    if (!req.body) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const educationItems = req.body.data;
+    const educationItems = req.body;
 
     await educationItems.forEach(async (item) => {
       const id = item._id;
@@ -197,13 +189,13 @@ const bulkUpdateEducationItems = async (req, res, next) => {
 
 const deleteEducationItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
+    if (!req.body) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    let educationItem = req.body.data;
+    let educationItem = req.body;
     let educationId = educationItem.education;
-    const id = req.body.data._id;
+    const id = req.body._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Http404Error(

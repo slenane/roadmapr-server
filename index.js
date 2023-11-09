@@ -17,7 +17,7 @@ const {
   returnError,
   isOperationalError,
 } = require("./errorHandler");
-require("./middleware/auth.js");
+require("./middleware/passport-authenticate.js");
 
 const app = express();
 

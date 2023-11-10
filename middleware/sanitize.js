@@ -5,6 +5,16 @@ const Http400Error = require("../utils/errorHandling/http400Error");
 const validUrlRegex =
   /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
 
+const validateOptionalDate = (value) => {
+  if (value === null) return true;
+  return !isNaN(Date.parse(value));
+};
+
+const validateOptionalLink = (value) => {
+  if (value === "") return true;
+  return value.match(validUrlRegex);
+};
+
 const rules = {
   username: body("username", ALERTS.AUTH.ERROR.USERNAME_INVALID)
     .isLength({ min: 2, max: 20 })
@@ -19,14 +29,11 @@ const rules = {
     .trim()
     .escape(),
   startDate: body("startDate", ALERTS.START_DATE_INVALID)
-    .optional()
-    .isDate()
+    .custom(validateOptionalDate)
     .escape(),
   endDate: body("endDate", ALERTS.END_DATE_INVALID)
-    .optional()
-    .isDate()
+    .custom(validateOptionalDate)
     .escape(),
-
   title: body("title", ALERTS.TITLE_INVALID)
     .isLength({ min: 3 })
     .trim()
@@ -49,6 +56,11 @@ const rules = {
     }
     return true;
   }),
+  description: body("description", ALERTS.DESCRIPTION_INVALID)
+    .optional()
+    .trim()
+    .escape(),
+  notes: body("notes", ALERTS.NOTES_INVALID).optional().trim().escape(),
   locationId: body("location.*.id", ALERTS.PROFILE.ERROR.LOCATION_INVALID)
     .isLength({ min: 2, max: 2 })
     .trim()
@@ -86,28 +98,28 @@ const rules = {
     .trim()
     .escape(),
   cv: body("links.*.cv", ALERTS.LINK_INVALID)
-    .optional()
-    .matches(validUrlRegex)
+    .custom(validateOptionalLink)
     .escape(),
   linkedIn: body("links.*.linkedIn", ALERTS.LINK_INVALID)
-    .optional()
-    .matches(validUrlRegex)
+    .custom(validateOptionalLink)
     .escape(),
   portfolio: body("links.*.portfolio", ALERTS.LINK_INVALID)
-    .optional()
-    .matches(validUrlRegex)
+    .custom(validateOptionalLink)
     .escape(),
   twitter: body("links.*.twitter", ALERTS.LINK_INVALID)
-    .optional()
-    .matches(validUrlRegex)
+    .custom(validateOptionalLink)
     .escape(),
   project: body("project", ALERTS.LINK_INVALID)
-    .optional()
-    .matches(validUrlRegex)
+    .custom(validateOptionalLink)
     .escape(),
   companyLink: body("companyLink", ALERTS.LINK_INVALID)
-    .optional()
-    .matches(validUrlRegex)
+    .custom(validateOptionalLink)
+    .escape(),
+  github: body("github", ALERTS.LINK_INVALID)
+    .custom(validateOptionalLink)
+    .escape(),
+  projectLink: body("link", ALERTS.LINK_INVALID)
+    .custom(validateOptionalLink)
     .escape(),
   link: body("link", ALERTS.LINK_INVALID).matches(validUrlRegex).escape(),
 };
@@ -143,6 +155,7 @@ const getEducationRules = () => {
     rules.startDate,
     rules.endDate,
     rules.link,
+    rules.description,
   ];
 };
 
@@ -161,6 +174,7 @@ const getEmploymentRules = () => {
     rules.startDate,
     rules.endDate,
     rules.stack,
+    rules.description,
   ];
 };
 
@@ -178,6 +192,25 @@ const getProfileRules = () => {
     rules.nationalityName,
     rules.pathId,
     rules.pathName,
+  ];
+};
+
+const getProjectsRules = () => {
+  return [
+    body("type").custom((value) => {
+      if (value !== "educational" && value !== "personal") {
+        throw new Error(ALERTS.PROJECTS.ERROR.TYPE_INVALID);
+      }
+      return true;
+    }),
+    rules.title,
+    rules.startDate,
+    rules.endDate,
+    rules.stack,
+    rules.projectLink,
+    rules.github,
+    rules.description,
+    rules.notes,
   ];
 };
 
@@ -202,5 +235,6 @@ module.exports = {
   getEducationRules,
   getEmploymentRules,
   getProfileRules,
+  getProjectsRules,
   sanitize,
 };

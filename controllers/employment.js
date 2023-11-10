@@ -25,7 +25,7 @@ const getEmployment = async (req, res, next) => {
 const createEmploymentItem = async (req, res, next) => {
   try {
     const employmentItem = new EmploymentItem({
-      ...req.body.data,
+      ...req.body,
       employment: req.params.id,
     });
 
@@ -52,8 +52,8 @@ const createEmploymentItem = async (req, res, next) => {
 
 const updateEmploymentItem = async (req, res, next) => {
   try {
-    const employmentItem = req.body.data;
-    const id = req.body.data._id;
+    const employmentItem = req.body;
+    const id = req.body._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.ITEM_NOT_FOUND);
@@ -83,11 +83,11 @@ const updateEmploymentItem = async (req, res, next) => {
 
 const bulkUpdateEmploymentItems = async (req, res, next) => {
   try {
-    if (!req.body.data) {
+    if (!req.body) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const employmentItems = req.body.data;
+    const employmentItems = req.body;
 
     employmentItems.forEach(async (item) => {
       const id = item._id;
@@ -122,11 +122,11 @@ const bulkUpdateEmploymentItems = async (req, res, next) => {
 
 const deleteEmploymentItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
+    if (!req.body) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const employmentItem = req.body.data;
+    const employmentItem = req.body;
     const employmentId = employmentItem.employment;
 
     if (!mongoose.Types.ObjectId.isValid(employmentItem._id)) {

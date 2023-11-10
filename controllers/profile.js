@@ -63,11 +63,7 @@ const getProfile = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
   try {
-    if (!req.body.data) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
-    const data = req.body.data;
+    const data = req.body;
     const id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {

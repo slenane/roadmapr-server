@@ -7,11 +7,12 @@ const {
 } = require("../controllers/profile.js");
 const { isAuth } = require("../middleware/is-auth.js");
 const upload = require("../multerConfig.js");
+const { getProfileRules, sanitize } = require("../middleware/sanitize.js");
 
 const router = express.Router();
 
 router.get("", isAuth, getProfile);
-router.patch("/:id", isAuth, updateProfile);
+router.patch("/:id", isAuth, getProfileRules(), sanitize, updateProfile);
 router.post(
   "/profile-image-upload",
   isAuth,

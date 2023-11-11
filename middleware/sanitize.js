@@ -5,8 +5,10 @@ const Http400Error = require("../utils/errorHandling/http400Error");
 const validUrlRegex =
   /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
 
+const validUsernamePattern = /^[^\s]{3,20}$/;
+
 const validateOptionalDate = (value) => {
-  if (value === null) return true;
+  if (!!value === false) return true;
   return !isNaN(Date.parse(value));
 };
 
@@ -17,7 +19,7 @@ const validateOptionalLink = (value) => {
 
 const rules = {
   username: body("username", ALERTS.AUTH.ERROR.USERNAME_INVALID)
-    .isLength({ min: 2, max: 20 })
+    .matches(validUsernamePattern)
     .trim()
     .escape(),
   email: body("email", ALERTS.AUTH.ERROR.EMAIL_INVALID)
@@ -25,6 +27,14 @@ const rules = {
     .isEmail()
     .normalizeEmail(),
   password: body("password", ALERTS.AUTH.ERROR.PASSWORD_INVALID)
+    .isLength({ min: 6, max: 20 })
+    .trim()
+    .escape(),
+  newPassword: body("current", ALERTS.AUTH.ERROR.PASSWORD_INVALID)
+    .isLength({ min: 6, max: 20 })
+    .trim()
+    .escape(),
+  currentPassword: body("new", ALERTS.AUTH.ERROR.PASSWORD_INVALID)
     .isLength({ min: 6, max: 20 })
     .trim()
     .escape(),
@@ -214,6 +224,36 @@ const getProjectsRules = () => {
   ];
 };
 
+getEmailRules = () => {
+  return [rules.email];
+};
+
+getPasswordRules = () => {
+  return [rules.password];
+};
+
+getExistingPasswordRules = () => {
+  return [rules.currentPassword, rules.newPassword];
+};
+
+getSettingsRules = () => {
+  return [
+    body("username", ALERTS.AUTH.ERROR.USERNAME_INVALID)
+      .optional()
+      .matches(validUsernamePattern)
+      .trim()
+      .escape(),
+    body("firstName", ALERTS.PROFILE.ERROR.FIRST_NAME_INVALID)
+      .optional()
+      .trim()
+      .escape(),
+    body("lastName", ALERTS.PROFILE.ERROR.LAST_NAME_INVALID)
+      .optional()
+      .trim()
+      .escape(),
+  ];
+};
+
 const sanitize = (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -236,5 +276,9 @@ module.exports = {
   getEmploymentRules,
   getProfileRules,
   getProjectsRules,
+  getEmailRules,
+  getPasswordRules,
+  getExistingPasswordRules,
+  getSettingsRules,
   sanitize,
 };

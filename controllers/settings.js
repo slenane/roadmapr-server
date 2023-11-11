@@ -34,11 +34,7 @@ const getSettings = async (req, res, next) => {
 
 const updateSettings = async (req, res, next) => {
   try {
-    if (!req.body.data) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
-    const data = req.body.data;
+    const data = req.body;
     const id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -63,10 +59,6 @@ const updateSettings = async (req, res, next) => {
 
 const updateEmail = async (req, res, next) => {
   try {
-    if (!req.body.email) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
     const user = await User.findById(req.auth._id);
 
     if (!user) {
@@ -128,10 +120,6 @@ const verifyEmailUpdate = async (req, res) => {
 
 const updatePassword = async (req, res, next) => {
   try {
-    if (!req.body.password) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
     const user = await User.findById(req.auth._id);
 
     if (!user) {
@@ -154,11 +142,7 @@ const updatePassword = async (req, res, next) => {
 
 const updateExistingPassword = async (req, res, next) => {
   try {
-    if (!req.body.current) {
-      throw new Http400Error(ALERTS.SETTINGS.ERROR.CURRENT_PASSWORD_REQUIRED);
-    } else if (!req.body.new) {
-      throw new Http400Error(ALERTS.SETTINGS.ERROR.NEW_PASSWORD_REQUIRED);
-    } else if (req.body.current === req.body.new) {
+    if (req.body.current === req.body.new) {
       throw new Http400Error(ALERTS.SETTINGS.ERROR.PASSWORDS_MATCH);
     }
 

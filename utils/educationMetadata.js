@@ -13,10 +13,10 @@ const AMAZON_TITLE_REGEX = /\/([^\/]+)\/dp\/\d+/,
   FREE_CODE_CAMP_TITLE_REGEX = /\/([^\/]+)\/(?=\?|$)/,
   YOUTUBE_TITLE_REGEX = /[?&]v=([^&]+)/,
   EDX_TITLE_REGEX = /\/([^\/?]+)(?:\?.*)?\/?$/,
-  COURSERA_TITLE_REGEX = /\/([^\/]+)\/(?=\?|$)/,
-  PLURALSIGHT_TITLE_REGEX = /\/([^\/]+)(?=\/|$)/,
+  COURSERA_TITLE_REGEX = /\/([^\/?]+)(?:\?.*)?\/?$/,
+  PLURALSIGHT_TITLE_REGEX = /\/([^\/?]+)(?:\?.*)?\/?$/,
   CODECADEMY_TITLE_REGEX = /\/learn\/([^\/]+)/,
-  KHAN_ACADEMY_TITLE_REGEX = /\/([^\/]+)/;
+  KHAN_ACADEMY_TITLE_REGEX = /\/([^\/?]+)(?:\?.*)?\/?$/;
 
 const AMAZON_ISBN_REGEX = /dp\/(\d+)/;
 

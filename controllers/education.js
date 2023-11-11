@@ -4,13 +4,8 @@ const EducationItem = require("../models/education/EducationItem.js");
 const Http404Error = require("../utils/errorHandling/http404Error");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
 const {
-  generateEducationItemMetadata,
-  hasMetadata,
-  metadataUpdateRequired,
-} = require("../utils/educationMetadata.js");
-const {
-  updateEducationRecommendation,
-  removeEducationRecommendation,
+  updateRecommendations,
+  removeRecommendations,
 } = require("./recommendation.js");
 // const fetchEducationItem = require("../utils/fetchEducationItem.js");
 const ALERTS = require("../utils/alerts.js");
@@ -39,15 +34,12 @@ const createEducationItem = async (req, res, next) => {
       education: req.params.id,
     });
 
-    educationItem.metadata = generateEducationItemMetadata(educationItem.link);
-    if (educationItem.metadata) {
-      await updateEducationRecommendation(
-        req.session.user,
-        educationItem.metadata,
-        educationItem.isRecommended,
-        next
-      );
-    }
+    educationItem.metadata = await updateRecommendations(
+      req.session.user,
+      educationItem,
+      undefined, // No original value for metadata on new item
+      next
+    );
 
     await educationItem.save();
 
@@ -87,44 +79,24 @@ const updateEducationItem = async (req, res, next) => {
       );
     }
 
+    originalEducationItem = await EducationItem.findOne({
+      _id: id,
+    });
+
+    const originalMetadata = originalEducationItem?.metadata;
+
+    educationItem.metadata = await updateRecommendations(
+      req.session.user,
+      educationItem,
+      originalMetadata,
+      next
+    );
+
     educationItem = await EducationItem.findByIdAndUpdate(
       id,
       { ...educationItem, id },
       { new: true }
     );
-
-    if (hasMetadata(educationItem.metadata)) {
-      const updatedMetadata = generateEducationItemMetadata(educationItem.link);
-
-      if (metadataUpdateRequired(educationItem.metadata, updatedMetadata)) {
-        await removeEducationRecommendation(
-          req.session.user,
-          educationItem.metadata,
-          educationItem.isRecommended,
-          next
-        );
-
-        await updateEducationRecommendation(
-          req.session.user,
-          updatedMetadata,
-          educationItem.isRecommended,
-          next
-        );
-      }
-    } else {
-      educationItem.metadata = await generateEducationItemMetadata(
-        educationItem.link
-      );
-
-      if (hasMetadata(educationItem.metadata)) {
-        await updateEducationRecommendation(
-          req.session.user,
-          educationItem.metadata,
-          educationItem.isRecommended,
-          next
-        );
-      }
-    }
 
     await educationItem.save();
 
@@ -205,14 +177,7 @@ const deleteEducationItem = async (req, res, next) => {
       );
     }
 
-    if (hasMetadata(educationItem.metadata)) {
-      await removeEducationRecommendation(
-        req.session.user,
-        educationItem.metadata,
-        educationItem.isRecommended,
-        next
-      );
-    }
+    await removeRecommendations(req.session.user, educationItem, next);
 
     await EducationItem.findByIdAndRemove(educationItem._id);
 

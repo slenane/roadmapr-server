@@ -3,7 +3,10 @@ const ALERTS = require("../utils/alerts");
 const Http400Error = require("../utils/errorHandling/http400Error");
 
 const validUrlRegex =
-  /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+  /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?(\?[a-z\d\.\-_%&=\+]+)?$/;
+
+const validYouTubeLink =
+  /^https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[a-zA-Z0-9_-]{11}/;
 
 const validUsernamePattern = /^[^\s]{3,20}$/;
 
@@ -12,9 +15,13 @@ const validateOptionalDate = (value) => {
   return !isNaN(Date.parse(value));
 };
 
+const validateLink = (value) => {
+  return value.match(validUrlRegex) || value.match(validYouTubeLink);
+};
+
 const validateOptionalLink = (value) => {
   if (value === "") return true;
-  return value.match(validUrlRegex);
+  return value.match(validUrlRegex) || value.match(validYouTubeLink);
 };
 
 const rules = {
@@ -107,31 +114,23 @@ const rules = {
     .isLength({ min: 3 })
     .trim()
     .escape(),
-  cv: body("links.*.cv", ALERTS.LINK_INVALID)
-    .custom(validateOptionalLink)
-    .escape(),
-  linkedIn: body("links.*.linkedIn", ALERTS.LINK_INVALID)
-    .custom(validateOptionalLink)
-    .escape(),
-  portfolio: body("links.*.portfolio", ALERTS.LINK_INVALID)
-    .custom(validateOptionalLink)
-    .escape(),
-  twitter: body("links.*.twitter", ALERTS.LINK_INVALID)
-    .custom(validateOptionalLink)
-    .escape(),
-  project: body("project", ALERTS.LINK_INVALID)
-    .custom(validateOptionalLink)
-    .escape(),
-  companyLink: body("companyLink", ALERTS.LINK_INVALID)
-    .custom(validateOptionalLink)
-    .escape(),
-  github: body("github", ALERTS.LINK_INVALID)
-    .custom(validateOptionalLink)
-    .escape(),
-  projectLink: body("link", ALERTS.LINK_INVALID)
-    .custom(validateOptionalLink)
-    .escape(),
-  link: body("link", ALERTS.LINK_INVALID).matches(validUrlRegex).escape(),
+  cv: body("links.*.cv", ALERTS.LINK_INVALID).custom(validateOptionalLink),
+  linkedIn: body("links.*.linkedIn", ALERTS.LINK_INVALID).custom(
+    validateOptionalLink
+  ),
+  portfolio: body("links.*.portfolio", ALERTS.LINK_INVALID).custom(
+    validateOptionalLink
+  ),
+  twitter: body("links.*.twitter", ALERTS.LINK_INVALID).custom(
+    validateOptionalLink
+  ),
+  project: body("project", ALERTS.LINK_INVALID).custom(validateOptionalLink),
+  companyLink: body("companyLink", ALERTS.LINK_INVALID).custom(
+    validateOptionalLink
+  ),
+  github: body("github", ALERTS.LINK_INVALID).custom(validateOptionalLink),
+  projectLink: body("link", ALERTS.LINK_INVALID).custom(validateOptionalLink),
+  link: body("link", ALERTS.LINK_INVALID).custom(validateLink),
 };
 
 const getRegistrationRules = () => {

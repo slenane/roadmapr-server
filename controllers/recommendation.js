@@ -1,23 +1,73 @@
 const mongoose = require("mongoose");
 const Recommendation = require("../models/Recommendation.js");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
+const {
+  generateEducationItemMetadata,
+  hasMetadata,
+  metadataUpdateRequired,
+} = require("../utils/educationMetadata.js");
 
 const incrementCount = (value) => {
   return value ? value + 1 : 1;
 };
 
-const updateEducationRecommendation = async (
+const updateRecommendations = async (
   user,
-  data,
-  isRecommended,
+  educationItem,
+  originalMetadata,
   next
 ) => {
+  if (hasMetadata(educationItem.metadata)) {
+    educationItem.metadata = generateEducationItemMetadata(educationItem.link);
+
+    if (metadataUpdateRequired(originalMetadata, educationItem.metadata)) {
+      await removeRecommendation(
+        user,
+        originalMetadata,
+        educationItem.isRecommended,
+        next
+      );
+      await updateRecommendation(
+        user,
+        educationItem.metadata,
+        educationItem.isRecommended,
+        next
+      );
+    }
+  } else {
+    educationItem.metadata = await generateEducationItemMetadata(
+      educationItem.link
+    );
+
+    if (hasMetadata(educationItem.metadata)) {
+      await updateRecommendation(
+        user,
+        educationItem.metadata,
+        educationItem.isRecommended,
+        next
+      );
+    }
+  }
+  return educationItem.metadata;
+};
+
+const removeRecommendations = async (user, educationItem, next) => {
+  if (hasMetadata(educationItem.metadata)) {
+    await removeRecommendation(
+      user,
+      educationItem.metadata,
+      educationItem.isRecommended,
+      next
+    );
+  }
+};
+
+const updateRecommendation = async (user, data, isRecommended, next) => {
   try {
     if (
       !data.provider ||
       !data.title ||
-      (data.provider === "amazon" && !data.isbn) ||
-      !user
+      (data.provider === "amazon" && !data.isbn)
     ) {
       return;
     }
@@ -43,7 +93,7 @@ const updateEducationRecommendation = async (
     recommendation.count++;
     if (isRecommended) recommendation.recommended++;
 
-    const pathId = user.path.id;
+    const path = user.path.name;
     const nationalityId = user.nationality.id;
     const locationId = user.location.id;
 
@@ -51,7 +101,7 @@ const updateEducationRecommendation = async (
     recommendation.markModified("nationalities");
     recommendation.markModified("locations");
 
-    recommendation.paths[pathId] = incrementCount(recommendation.paths[pathId]);
+    recommendation.paths[path] = incrementCount(recommendation.paths[path]);
     recommendation.nationalities[nationalityId] = incrementCount(
       recommendation.nationalities[nationalityId]
     );
@@ -65,12 +115,7 @@ const updateEducationRecommendation = async (
   }
 };
 
-const removeEducationRecommendation = async (
-  user,
-  data,
-  isRecommended,
-  next
-) => {
+const removeRecommendation = async (user, data, isRecommended, next) => {
   try {
     if (
       !data.provider ||
@@ -85,6 +130,8 @@ const removeEducationRecommendation = async (
       provider: data.provider,
       title: data.title,
     });
+
+    if (!recommendation) return;
 
     recommendation.count--;
 
@@ -121,7 +168,8 @@ const removeEducationRecommendation = async (
     next(error);
   }
 };
+
 module.exports = {
-  updateEducationRecommendation,
-  removeEducationRecommendation,
+  updateRecommendations,
+  removeRecommendations,
 };

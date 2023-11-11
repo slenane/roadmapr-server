@@ -3,7 +3,10 @@ const ALERTS = require("../utils/alerts");
 const Http400Error = require("../utils/errorHandling/http400Error");
 
 const validUrlRegex =
-  /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+  /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?(\?[a-z\d\.\-_%&=\+]+)?$/;
+
+const validYouTubeLink =
+  /^https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[a-zA-Z0-9_-]{11}/;
 
 const validUsernamePattern = /^[^\s]{3,20}$/;
 
@@ -12,9 +15,13 @@ const validateOptionalDate = (value) => {
   return !isNaN(Date.parse(value));
 };
 
+const validateLink = (value) => {
+  return value.match(validUrlRegex) || value.match(validYouTubeLink);
+};
+
 const validateOptionalLink = (value) => {
   if (value === "") return true;
-  return value.match(validUrlRegex);
+  return value.match(validUrlRegex) || value.match(validYouTubeLink);
 };
 
 const rules = {
@@ -123,7 +130,7 @@ const rules = {
   ),
   github: body("github", ALERTS.LINK_INVALID).custom(validateOptionalLink),
   projectLink: body("link", ALERTS.LINK_INVALID).custom(validateOptionalLink),
-  link: body("link", ALERTS.LINK_INVALID).matches(validUrlRegex),
+  link: body("link", ALERTS.LINK_INVALID).custom(validateLink),
 };
 
 const getRegistrationRules = () => {

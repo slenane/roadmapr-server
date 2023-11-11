@@ -177,12 +177,7 @@ const deleteEducationItem = async (req, res, next) => {
       );
     }
 
-    await removeRecommendations(
-      req.session.user,
-      educationItem.metadata,
-      educationItem.isRecommended,
-      next
-    );
+    await removeRecommendations(req.session.user, educationItem, next);
 
     await EducationItem.findByIdAndRemove(educationItem._id);
 

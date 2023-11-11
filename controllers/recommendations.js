@@ -11,6 +11,44 @@ const incrementCount = (value) => {
   return value ? value + 1 : 1;
 };
 
+const getRecommendations = async (req, res, next) => {
+  try {
+    const user = req.session.user;
+    if (!user) return;
+
+    const path = user.path.name;
+    const location = user.location.id;
+    const nationality = user.nationality.id;
+
+    let recommendations = await Recommendation.find({
+      $or: [
+        { path: { $regex: new RegExp(path, "i") } },
+        { location: { $regex: new RegExp(location, "i") } },
+        { nationality: { $regex: new RegExp(nationality, "i") } },
+      ],
+    });
+
+    recommendations = recommendations.filter((recommendation) => {
+      return (recommendation.recommended / recommendation.count) * 100 >= 90;
+    });
+
+    recommendations.sort((a, b) => {
+      const matchesA = [a.path, a.location, a.nationality].filter(
+        Boolean
+      ).length;
+      const matchesB = [b.path, b.location, b.nationality].filter(
+        Boolean
+      ).length;
+
+      return matchesB - matchesA;
+    });
+
+    res.status(200).json(recommendations);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const updateRecommendations = async (
   user,
   educationItem,
@@ -170,6 +208,7 @@ const removeRecommendation = async (user, data, isRecommended, next) => {
 };
 
 module.exports = {
+  getRecommendations,
   updateRecommendations,
   removeRecommendations,
 };

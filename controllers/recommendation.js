@@ -17,7 +17,7 @@ const updateRecommendations = async (
   originalMetadata,
   next
 ) => {
-  if (hasMetadata(educationItem.metadata)) {
+  if (hasMetadata(educationItem?.metadata)) {
     educationItem.metadata = generateEducationItemMetadata(educationItem.link);
 
     if (metadataUpdateRequired(originalMetadata, educationItem.metadata)) {
@@ -39,7 +39,7 @@ const updateRecommendations = async (
       educationItem.link
     );
 
-    if (hasMetadata(educationItem.metadata)) {
+    if (hasMetadata(educationItem?.metadata)) {
       await updateRecommendation(
         user,
         educationItem.metadata,
@@ -52,7 +52,7 @@ const updateRecommendations = async (
 };
 
 const removeRecommendations = async (user, educationItem, next) => {
-  if (hasMetadata(educationItem.metadata)) {
+  if (hasMetadata(educationItem?.metadata)) {
     await removeRecommendation(
       user,
       educationItem.metadata,

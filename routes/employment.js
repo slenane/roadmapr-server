@@ -6,19 +6,27 @@ const {
   bulkUpdateEmploymentItems,
   deleteEmploymentItem,
 } = require("../controllers/employment.js");
-const { expressjwt: jwt } = require("express-jwt");
-
-const isAuth = jwt({
-  secret: process.env.DB_SECRET,
-  algorithms: ["HS256"],
-});
+const { isAuth } = require("../middleware/is-auth.js");
+const { getEmploymentRules, sanitize } = require("../middleware/sanitize.js");
 
 const router = express.Router();
 
 router.get("", isAuth, getEmployment);
 router.get("/:id", isAuth, getEmployment);
-router.post("/:id", isAuth, createEmploymentItem);
-router.patch("/edit/:id", isAuth, updateEmploymentItem);
+router.post(
+  "/:id",
+  isAuth,
+  getEmploymentRules(),
+  sanitize,
+  createEmploymentItem
+);
+router.patch(
+  "/edit/:id",
+  getEmploymentRules(),
+  sanitize,
+  isAuth,
+  updateEmploymentItem
+);
 router.patch("/bulk-edit/:id", isAuth, bulkUpdateEmploymentItems);
 router.post("/remove/:id", isAuth, deleteEmploymentItem);
 

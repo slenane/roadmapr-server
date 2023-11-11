@@ -24,12 +24,8 @@ const getProjects = async (req, res, next) => {
 
 const createProjectItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
     const projectItem = new ProjectItem({
-      ...req.body.data,
+      ...req.body,
       projects: req.params.id,
     });
 
@@ -56,12 +52,8 @@ const createProjectItem = async (req, res, next) => {
 
 const updateProjectItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
-      throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    }
-
-    const projectItem = req.body.data;
-    const id = req.body.data._id;
+    const projectItem = req.body;
+    const id = req.body._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Http404Error(ALERTS.PROJECTS.ERROR.ITEM_NOT_FOUND);
@@ -91,11 +83,11 @@ const updateProjectItem = async (req, res, next) => {
 
 const bulkUpdateProjectItems = async (req, res, next) => {
   try {
-    if (!req.body.data) {
+    if (!req.body) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const projectItems = req.body.data;
+    const projectItems = req.body;
 
     projectItems.forEach(async (item) => {
       const id = item._id;
@@ -126,13 +118,13 @@ const bulkUpdateProjectItems = async (req, res, next) => {
 
 const deleteProjectItem = async (req, res, next) => {
   try {
-    if (!req.body.data) {
+    if (!req.body) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const projectItem = req.body.data;
+    const projectItem = req.body;
     const projectsId = projectItem.projects;
-    const id = req.body.data._id;
+    const id = req.body._id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Http404Error(ALERTS.PROJECTS.ERROR.ITEM_NOT_FOUND);

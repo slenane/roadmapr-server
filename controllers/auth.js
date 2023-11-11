@@ -25,10 +25,6 @@ const register = async (req, res, next) => {
   try {
     if (!req.body) {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
-    } else if (!req.body.username || !req.body.email || !req.body.password) {
-      throw new Http400Error(ALERTS.MISSING_FIELDS);
-    } else if (req.body.username.length < 2) {
-      throw new Http400Error(ALERTS.AUTH.ERROR.USERNAME_INVALID);
     } else if (await User.exists({ username: req.body.username })) {
       throw new Http400Error(ALERTS.AUTH.ERROR.USERNAME_USED);
     } else if (!emailRegex.test(req.body.email)) {

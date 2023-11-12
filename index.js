@@ -29,6 +29,7 @@ const educationRoutes = require("./routes/education.js");
 const profileRoutes = require("./routes/profile.js");
 const projectsRoutes = require("./routes/projects.js");
 const settingsRoutes = require("./routes/settings.js");
+const recommendationsRoutes = require("./routes/recommendations.js");
 
 // DATABASE SETUP
 const MONGODB_URI = config.DB_CONNECTION_URL;
@@ -77,21 +78,6 @@ app.use(
     saveUninitialized: true,
   })
 );
-app.use(async (req, res, next) => {
-  if (!req.session.user) {
-    const userId = req.session.userId;
-
-    if (userId) {
-      try {
-        const user = await User.findById(userId);
-        req.session.user = user; // Store user information in the session
-      } catch (error) {
-        next(error);
-      }
-    }
-  }
-  next();
-});
 
 // ROUTES
 app.use("/api/auth", authRoutes);
@@ -101,6 +87,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/education", educationRoutes);
 app.use("/api/projects", projectsRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/recommendations", recommendationsRoutes);
 
 // ERROR HANDLERS
 app.use(logErrorMiddleware);

@@ -117,7 +117,6 @@ const login = (req, res, next) => {
         throw new Http400Error(ALERTS.AUTH.ERROR.EMAIL_NOT_VERIFIED);
       }
 
-      req.session.userId = user._id;
       const token = user.generateJwt();
       res.status(200).json({ token, user });
     } catch (error) {

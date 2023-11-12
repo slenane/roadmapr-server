@@ -6,7 +6,7 @@ const Http400Error = require("../utils/errorHandling/http400Error.js");
 const {
   updateRecommendations,
   removeRecommendations,
-} = require("./recommendation.js");
+} = require("./recommendations.js");
 // const fetchEducationItem = require("../utils/fetchEducationItem.js");
 const ALERTS = require("../utils/alerts.js");
 
@@ -35,7 +35,7 @@ const createEducationItem = async (req, res, next) => {
     });
 
     educationItem.metadata = await updateRecommendations(
-      req.session.user,
+      req.auth,
       educationItem,
       undefined, // No original value for metadata on new item
       next
@@ -86,7 +86,7 @@ const updateEducationItem = async (req, res, next) => {
     const originalMetadata = originalEducationItem?.metadata;
 
     educationItem.metadata = await updateRecommendations(
-      req.session.user,
+      req.auth,
       educationItem,
       originalMetadata,
       next
@@ -177,7 +177,7 @@ const deleteEducationItem = async (req, res, next) => {
       );
     }
 
-    await removeRecommendations(req.session.user, educationItem, next);
+    await removeRecommendations(req.auth, educationItem, next);
 
     await EducationItem.findByIdAndRemove(educationItem._id);
 

@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const employmentSchema = Schema({
-  employmentList: [
+const experienceSchema = Schema({
+  experienceList: [
     {
       type: Schema.Types.ObjectId,
-      ref: "EmploymentItem",
+      ref: "ExperienceItem",
     },
   ],
   user: {
@@ -14,4 +14,4 @@ const employmentSchema = Schema({
   },
 });
 
-module.exports = mongoose.model("Employment", employmentSchema);
+module.exports = mongoose.model("Experience", experienceSchema);

@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const User = require("../models/User.js");
 const EducationItem = require("../models/education/EducationItem.js");
 const Education = require("../models/education/Education.js");
-const EmploymentItem = require("../models/employment/EmploymentItem.js");
-const Employment = require("../models/employment/Employment.js");
+const ExperienceItem = require("../models/experience/ExperienceItem.js");
+const Experience = require("../models/experience/Experience.js");
 const ProjectItem = require("../models/projects/ProjectItem.js");
 const Projects = require("../models/projects/Projects.js");
 const Http500Error = require("../utils/errorHandling/http500Error.js");
@@ -184,13 +184,13 @@ const deleteAccount = async (req, res, next) => {
     await EducationItem.deleteMany({ education: education._id });
     await Education.deleteOne({ user: userId });
 
-    // Delete Employment
-    const employment = await Employment.findOne({ user: userId });
-    if (!employment) {
-      throw new Http500Error(ALERTS.SETTINGS.ERROR.EMPLOYMENT_DATA);
+    // Delete Experience
+    const experience = await Experience.findOne({ user: userId });
+    if (!experience) {
+      throw new Http500Error(ALERTS.SETTINGS.ERROR.EXPERIENCE);
     }
-    await EmploymentItem.deleteMany({ employment: employment._id });
-    await Employment.deleteOne({ user: userId });
+    await ExperienceItem.deleteMany({ experience: experience._id });
+    await Experience.deleteOne({ user: userId });
 
     // Delete Projects
     const projects = await Projects.findOne({ user: userId });

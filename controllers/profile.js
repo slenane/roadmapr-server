@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/User.js");
 const Education = require("../models/education/Education.js");
-const Employment = require("../models/employment/Employment.js");
+const Experience = require("../models/experience/Experience.js");
 const Projects = require("../models/projects/Projects.js");
 const Http404Error = require("../utils/errorHandling/http404Error.js");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
@@ -26,15 +26,15 @@ const getProfile = async (req, res, next) => {
       throw new Http404Error(ALERTS.EDUCATION.ERROR.NOT_FOUND);
     }
 
-    const employment = await Employment.findById(user.employment)
+    const experience = await Experience.findById(user.experience)
       .populate({
-        path: "employmentList",
+        path: "experienceList",
         match: { startDate: { $ne: null } },
       })
       .exec();
 
     if (!education) {
-      throw new Http404Error(ALERTS.EMPLOYMENT.ERROR.NOT_FOUND);
+      throw new Http404Error(ALERTS.EXPERIENCE.ERROR.NOT_FOUND);
     }
 
     const projects = await Projects.findById(user.projects)
@@ -51,7 +51,7 @@ const getProfile = async (req, res, next) => {
     const updatedUser = {
       ...user.toObject(),
       educationList: sortItemsByDate(education.educationList),
-      employmentList: sortItemsByDate(employment.employmentList),
+      experienceList: sortItemsByDate(experience.experienceList),
       projectList: sortItemsByDate(projects.projectList),
     };
 

@@ -110,9 +110,10 @@ userSchema.methods.generateJwt = function () {
   return jwt.sign(
     {
       _id: this._id,
-      email: this.email,
-      firstName: this.firstName,
-      lastName: this.lastName,
+      username: this.username,
+      path: this.path,
+      location: this.location,
+      nationality: this.nationality,
       exp: parseInt(expiry.getTime() / 1000),
     },
     process.env.DB_SECRET

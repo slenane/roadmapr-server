@@ -78,21 +78,6 @@ app.use(
     saveUninitialized: true,
   })
 );
-app.use(async (req, res, next) => {
-  if (!req.session.user) {
-    const userId = req.session.userId;
-
-    if (userId) {
-      try {
-        const user = await User.findById(userId);
-        req.session.user = user; // Store user information in the session
-      } catch (error) {
-        next(error);
-      }
-    }
-  }
-  next();
-});
 
 // ROUTES
 app.use("/api/auth", authRoutes);

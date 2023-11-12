@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Recommendation = require("../models/Recommendation.js");
+const Education = require("../models/education/Education.js");
+const EducationItem = require("../models/education/EducationItem.js");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
 const {
   generateEducationItemMetadata,
@@ -13,12 +15,18 @@ const incrementCount = (value) => {
 
 const getRecommendations = async (req, res, next) => {
   try {
-    const user = req.session.user;
+    const user = req.auth;
     if (!user) return;
 
     const path = user.path.name;
     const location = user.location.id;
     const nationality = user.nationality.id;
+    const education = await Education.findOne({ user: user._id })
+      .populate("educationList")
+      .exec();
+    const educationMetadata = education.educationList.map(
+      (item) => item?.metadata
+    );
 
     let recommendations = await Recommendation.find({
       $or: [
@@ -28,22 +36,35 @@ const getRecommendations = async (req, res, next) => {
       ],
     });
 
-    recommendations = recommendations.filter((recommendation) => {
-      return (recommendation.recommended / recommendation.count) * 100 >= 90;
-    });
+    const userRecommendations = recommendations
+      .filter((recommendation) => {
+        return !educationMetadata.find((item) => {
+          return (
+            item.provider === recommendation.internal.provider &&
+            item.title === recommendation.internal.title
+          );
+        });
+      })
+      .filter((recommendation) => {
+        return (
+          !!recommendation.title &&
+          !!recommendation.author &&
+          (recommendation.recommended / recommendation.count) * 100 >= 90
+        );
+      })
+      .sort((a, b) => {
+        const matchesA = [a.path, a.location, a.nationality].filter(
+          Boolean
+        ).length;
+        const matchesB = [b.path, b.location, b.nationality].filter(
+          Boolean
+        ).length;
 
-    recommendations.sort((a, b) => {
-      const matchesA = [a.path, a.location, a.nationality].filter(
-        Boolean
-      ).length;
-      const matchesB = [b.path, b.location, b.nationality].filter(
-        Boolean
-      ).length;
+        return matchesB - matchesA;
+      })
+      .splice(0, 3);
 
-      return matchesB - matchesA;
-    });
-
-    res.status(200).json(recommendations);
+    res.status(200).json(userRecommendations);
   } catch (error) {
     next(error);
   }
@@ -65,12 +86,7 @@ const updateRecommendations = async (
         educationItem.isRecommended,
         next
       );
-      await updateRecommendation(
-        user,
-        educationItem.metadata,
-        educationItem.isRecommended,
-        next
-      );
+      await updateRecommendation(user, educationItem, next);
     }
   } else {
     educationItem.metadata = await generateEducationItemMetadata(
@@ -78,12 +94,7 @@ const updateRecommendations = async (
     );
 
     if (hasMetadata(educationItem?.metadata)) {
-      await updateRecommendation(
-        user,
-        educationItem.metadata,
-        educationItem.isRecommended,
-        next
-      );
+      await updateRecommendation(user, educationItem, next);
     }
   }
   return educationItem.metadata;
@@ -100,36 +111,44 @@ const removeRecommendations = async (user, educationItem, next) => {
   }
 };
 
-const updateRecommendation = async (user, data, isRecommended, next) => {
+const updateRecommendation = async (user, item, next) => {
   try {
     if (
-      !data.provider ||
-      !data.title ||
-      (data.provider === "amazon" && !data.isbn)
+      !item.metadata.provider ||
+      !item.metadata.title ||
+      (item.metadata.provider === "amazon" && !item.metadata.isbn)
     ) {
       return;
     }
 
     let recommendation = await Recommendation.findOne({
-      provider: data.provider,
-      title: data.title,
+      "internal.provider": item.metadata.provider,
+      "internal.title": item.metadata.title,
     });
 
     if (!recommendation) {
       recommendation = new Recommendation({
-        provider: data.provider,
-        title: data.title,
-        ...(data.isbn ? { isbn: data.isbn } : {}),
+        internal: {
+          provider: item.metadata.provider,
+          title: item.metadata.title,
+        },
+        author: "",
+        title: "",
+        type: item.metadata.provider === "amazon" ? "book" : "course",
+        ...(item.stack ? { stack: item.stack } : {}),
+        ...(item.metadata.isbn ? { isbn: item.metadata.isbn } : {}),
         count: 0,
         recommended: 0,
         paths: {},
         nationalities: {},
         locations: {},
+        description: "",
+        link: item.link,
       });
     }
 
     recommendation.count++;
-    if (isRecommended) recommendation.recommended++;
+    if (item.isRecommended) recommendation.recommended++;
 
     const path = user.path.name;
     const nationalityId = user.nationality.id;
@@ -165,8 +184,8 @@ const removeRecommendation = async (user, data, isRecommended, next) => {
     }
 
     const recommendation = await Recommendation.findOne({
-      provider: data.provider,
-      title: data.title,
+      "internal.provider": data.provider,
+      "internal.title": data.title,
     });
 
     if (!recommendation) return;

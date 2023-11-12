@@ -23,7 +23,7 @@ const app = express();
 
 // ROUTES FILES
 const authRoutes = require("./routes/auth.js");
-const dashboardRoutes = require("./routes/dashboard.js");
+const roadmapRoutes = require("./routes/roadmap.js");
 const experienceRoutes = require("./routes/experience.js");
 const educationRoutes = require("./routes/education.js");
 const profileRoutes = require("./routes/profile.js");
@@ -81,7 +81,7 @@ app.use(
 
 // ROUTES
 app.use("/api/auth", authRoutes);
-app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/roadmap", roadmapRoutes);
 app.use("/api/experience", experienceRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/education", educationRoutes);

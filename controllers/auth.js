@@ -3,6 +3,7 @@ const config = require("../config");
 const crypto = require("crypto");
 const passport = require("passport");
 const User = require("../models/User.js");
+const Roadmap = require("../models/Roadmap.js");
 const Education = require("../models/education/Education.js");
 const Experience = require("../models/experience/Experience.js");
 const Projects = require("../models/projects/Projects.js");
@@ -52,13 +53,22 @@ const register = async (req, res, next) => {
     const projects = new Projects({ user: user._id });
     const education = new Education({ user: user._id });
 
+    const roadmap = new Roadmap({
+      user: user._id,
+      education: education._id,
+      projects: projects._id,
+      experience: experience._id,
+    });
+
     user.experience = experience._id;
     user.projects = projects._id;
     user.education = education._id;
+    user.roadmap = roadmap._id;
 
     await education.save();
     await experience.save();
     await projects.save();
+    await roadmap.save();
     await user.save();
 
     // Create the promise and SES service object
@@ -353,13 +363,22 @@ const getGithubUser = async (req, res, next) => {
           const projects = new Projects({ user: user._id });
           const education = new Education({ user: user._id });
 
+          const roadmap = new Roadmap({
+            user: user._id,
+            education: education._id,
+            projects: projects._id,
+            experience: experience._id,
+          });
+
           user.experience = experience._id;
           user.projects = projects._id;
           user.education = education._id;
+          user.roadmap = roadmap._id;
 
           await education.save();
           await experience.save();
           await projects.save();
+          await roadmap.save();
           await user.save();
 
           const token = user.generateJwt();

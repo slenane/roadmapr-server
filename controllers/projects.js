@@ -7,12 +7,12 @@ const ALERTS = require("../utils/alerts.js");
 
 const getProjects = async (req, res, next) => {
   try {
-    const projects = await Projects.findOne({ user: req.auth._id })
+    let projects = await Projects.findOne({ user: req.auth._id })
       .populate("projectList")
       .exec();
 
     if (!projects) {
-      projects = new Projects({ user: req.auth._id }).exec();
+      projects = new Projects({ user: req.auth._id });
       await projects.save();
     }
 

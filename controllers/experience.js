@@ -7,12 +7,12 @@ const ALERTS = require("../utils/alerts.js");
 
 const getExperience = async (req, res, next) => {
   try {
-    const experience = await Experience.findOne({ user: req.auth._id })
+    let experience = await Experience.findOne({ user: req.auth._id })
       .populate("experienceList")
       .exec();
 
     if (!experience) {
-      experience = new Experience({ user: req.auth._id }).exec();
+      experience = new Experience({ user: req.auth._id });
       await experience.save();
     }
 

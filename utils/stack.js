@@ -244,7 +244,7 @@
 //   { title: "TortoiseGit", name: "tortoisegit" },
 //   { title: "Tower Git", name: "towergit" },
 //   { title: "Travis CI", name: "travis" },
-//   { title: "Twitter", name: "twitter" },
+//   { title: "X", name: "x" },
 //   { title: "TypeScript", name: "typescript" },
 //   { title: "TYPO3", name: "typo3" },
 //   { title: "Ubuntu", name: "ubuntu" },

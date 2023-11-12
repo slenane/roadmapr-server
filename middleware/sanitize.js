@@ -121,9 +121,7 @@ const rules = {
   portfolio: body("links.*.portfolio", ALERTS.LINK_INVALID).custom(
     validateOptionalLink
   ),
-  twitter: body("links.*.twitter", ALERTS.LINK_INVALID).custom(
-    validateOptionalLink
-  ),
+  x: body("links.*.x", ALERTS.LINK_INVALID).custom(validateOptionalLink),
   project: body("project", ALERTS.LINK_INVALID).custom(validateOptionalLink),
   companyLink: body("companyLink", ALERTS.LINK_INVALID).custom(
     validateOptionalLink
@@ -192,7 +190,7 @@ const getProfileRules = () => {
     rules.cv,
     rules.portfolio,
     rules.linkedIn,
-    rules.twitter,
+    rules.x,
     rules.locationId,
     rules.locationName,
     rules.firstName,

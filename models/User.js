@@ -44,7 +44,7 @@ const userSchema = new Schema({
     cv: String,
     portfolio: String,
     github: String,
-    twitter: String,
+    x: String,
     linkedIn: String,
   },
   location: {

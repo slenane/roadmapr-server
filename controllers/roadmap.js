@@ -1,29 +1,36 @@
 const User = require("../models/User.js");
+const Roadmap = require("../models/Roadmap.js");
 const Education = require("../models/education/Education.js");
 const Experience = require("../models/experience/Experience.js");
 const Projects = require("../models/projects/Projects.js");
-// const axios = require("axios"); // Get github data
-const Http404Error = require("../utils/errorHandling/http404Error");
-const ALERTS = require("../utils/alerts.js");
 
-const getDashboard = async (req, res, next) => {
+const getRoadmap = async (req, res, next) => {
   const id = req.auth._id;
   try {
-    const user = await User.findById(id).exec();
+    let roadmap = await Roadmap.findOne({ user: id });
 
-    if (!user) {
-      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    if (!roadmap) {
+      const user = await User.findById(id);
+
+      roadmap = new Roadmap({
+        user: id,
+        education: user.education,
+        projects: user.projects,
+        experience: user.experience,
+      });
+
+      await roadmap.save();
     }
 
-    const education = await Education.findById(user.education)
+    const education = await Education.findById(roadmap.education)
       .populate("educationList")
       .exec();
 
-    const experience = await Experience.findById(user.experience)
+    const experience = await Experience.findById(roadmap.experience)
       .populate("experienceList")
       .exec();
 
-    const projects = await Projects.findById(user.projects)
+    const projects = await Projects.findById(roadmap.projects)
       .populate("projectList")
       .exec();
 
@@ -47,17 +54,17 @@ const getDashboard = async (req, res, next) => {
       { new: true }
     ).exec();
 
-    const dashboard = {
+    const roadmapConfig = {
       education: education.educationList,
       experience: experience.experienceList,
       projects: projects.projectList,
       github: [],
     };
 
-    res.status(200).json(dashboard);
+    res.status(200).json(roadmapConfig);
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { getDashboard };
+module.exports = { getRoadmap };

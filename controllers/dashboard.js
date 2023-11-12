@@ -1,6 +1,6 @@
 const User = require("../models/User.js");
 const Education = require("../models/education/Education.js");
-const Employment = require("../models/employment/Employment.js");
+const Experience = require("../models/experience/Experience.js");
 const Projects = require("../models/projects/Projects.js");
 // const axios = require("axios"); // Get github data
 const Http404Error = require("../utils/errorHandling/http404Error");
@@ -19,8 +19,8 @@ const getDashboard = async (req, res, next) => {
       .populate("educationList")
       .exec();
 
-    const employment = await Employment.findById(user.employment)
-      .populate("employmentList")
+    const experience = await Experience.findById(user.experience)
+      .populate("experienceList")
       .exec();
 
     const projects = await Projects.findById(user.projects)
@@ -29,7 +29,7 @@ const getDashboard = async (req, res, next) => {
 
     const stackList = [
       ...education.educationList.map((item) => item.stack),
-      ...employment.employmentList.map((item) => item.stack),
+      ...experience.experienceList.map((item) => item.stack),
       ...projects.projectList.map((item) => item.stack),
     ].flat(Infinity);
 
@@ -49,7 +49,7 @@ const getDashboard = async (req, res, next) => {
 
     const dashboard = {
       education: education.educationList,
-      employment: employment.employmentList,
+      experience: experience.experienceList,
       projects: projects.projectList,
       github: [],
     };

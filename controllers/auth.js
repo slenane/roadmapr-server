@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const passport = require("passport");
 const User = require("../models/User.js");
 const Education = require("../models/education/Education.js");
-const Employment = require("../models/employment/Employment.js");
+const Experience = require("../models/experience/Experience.js");
 const Projects = require("../models/projects/Projects.js");
 const {
   API_VERSION,
@@ -48,16 +48,16 @@ const register = async (req, res, next) => {
 
     await user.setPassword(req.body.password);
 
-    const employment = new Employment({ user: user._id });
+    const experience = new Experience({ user: user._id });
     const projects = new Projects({ user: user._id });
     const education = new Education({ user: user._id });
 
-    user.employment = employment._id;
+    user.experience = experience._id;
     user.projects = projects._id;
     user.education = education._id;
 
     await education.save();
-    await employment.save();
+    await experience.save();
     await projects.save();
     await user.save();
 
@@ -349,16 +349,16 @@ const getGithubUser = async (req, res, next) => {
               : githubUser.data.login,
           });
 
-          const employment = new Employment({ user: user._id });
+          const experience = new Experience({ user: user._id });
           const projects = new Projects({ user: user._id });
           const education = new Education({ user: user._id });
 
-          user.employment = employment._id;
+          user.experience = experience._id;
           user.projects = projects._id;
           user.education = education._id;
 
           await education.save();
-          await employment.save();
+          await experience.save();
           await projects.save();
           await user.save();
 

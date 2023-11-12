@@ -59,11 +59,11 @@ const rules = {
     .isLength({ min: 3 })
     .trim()
     .escape(),
-  company: body("company", ALERTS.EMPLOYMENT.ERROR.COMPANY_INVALID)
+  company: body("company", ALERTS.EXPERIENCE.ERROR.COMPANY_INVALID)
     .isLength({ min: 3 })
     .trim()
     .escape(),
-  role: body("role", ALERTS.EMPLOYMENT.ERROR.ROLE_INVALID)
+  role: body("role", ALERTS.EXPERIENCE.ERROR.ROLE_INVALID)
     .isLength({ min: 3 })
     .trim()
     .escape(),
@@ -168,11 +168,11 @@ const getEducationRules = () => {
   ];
 };
 
-const getEmploymentRules = () => {
+const getExperienceRules = () => {
   return [
     body("type").custom((value) => {
-      if (value !== "freelance" && value !== "employment") {
-        throw new Error(ALERTS.EMPLOYMENT.ERROR.TYPE_INVALID);
+      if (value !== "freelance" && value !== "professional") {
+        throw new Error(ALERTS.EXPERIENCE.ERROR.TYPE_INVALID);
       }
       return true;
     }),
@@ -272,7 +272,7 @@ module.exports = {
   getLoginRules,
   getResetPasswordRules,
   getEducationRules,
-  getEmploymentRules,
+  getExperienceRules,
   getProfileRules,
   getProjectsRules,
   getEmailRules,

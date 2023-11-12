@@ -12,12 +12,12 @@ const ALERTS = require("../utils/alerts.js");
 
 const getEducation = async (req, res, next) => {
   try {
-    const education = await Education.findOne({ user: req.auth._id })
+    let education = await Education.findOne({ user: req.auth._id })
       .populate("educationList")
       .exec();
 
     if (!education) {
-      education = new Education({ user: req.auth._id }).exec();
+      education = new Education({ user: req.auth._id });
       await education.save();
     }
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const employmentItemSchema = Schema({
+const experienceItemSchema = Schema({
   company: String,
   companyLink: String,
   description: String,
@@ -16,11 +16,11 @@ const employmentItemSchema = Schema({
   position: Number,
   startDate: Date,
   type: String,
-  employment: {
+  experience: {
     type: Schema.Types.ObjectId,
-    ref: "Employment",
+    ref: "Experience",
     required: true,
   },
 });
 
-module.exports = mongoose.model("EmploymentItem", employmentItemSchema);
+module.exports = mongoose.model("ExperienceItem", experienceItemSchema);

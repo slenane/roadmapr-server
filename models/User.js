@@ -83,7 +83,7 @@ const userSchema = new Schema({
     minlength: 2,
   },
   education: String,
-  employment: String,
+  experience: String,
   projects: String,
   hash: String,
   salt: String,

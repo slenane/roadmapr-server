@@ -41,6 +41,7 @@ const getUpdatedRemoteJobs = async (path) => {
           tags: job.tags,
           description: job.description,
           stack: getJobStack(job),
+          salary: `$${job.salary_min} - $${job.salary_max}`,
           url: job.url,
           applyUrl: job.apply_url,
           lastUpdate: currentDate,

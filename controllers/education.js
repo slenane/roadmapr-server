@@ -6,8 +6,7 @@ const Http400Error = require("../utils/errorHandling/http400Error.js");
 const {
   updateRecommendations,
   removeRecommendations,
-} = require("./recommendations.js");
-// const fetchEducationItem = require("../utils/fetchEducationItem.js");
+} = require("../utils/recommendations/educationRecommendations.js");
 const ALERTS = require("../utils/alerts.js");
 
 const getEducation = async (req, res, next) => {

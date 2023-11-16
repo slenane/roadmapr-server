@@ -10,6 +10,7 @@ const remoteJobSchema = new Schema({
   tags: [Schema.Types.Mixed],
   description: String,
   stack: [Schema.Types.Mixed],
+  salary: String,
   url: String,
   applyUrl: String,
   lastUpdate: Date,

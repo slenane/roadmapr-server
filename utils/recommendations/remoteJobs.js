@@ -41,7 +41,7 @@ const getUpdatedRemoteJobs = async (path) => {
           tags: job.tags,
           description: job.description,
           stack: getJobStack(job),
-          salary: `$${job.salary_min} - $${job.salary_max}`,
+          salary: getSalaryExpectation(job),
           url: job.url,
           applyUrl: job.apply_url,
           lastUpdate: currentDate,
@@ -74,6 +74,21 @@ const getUpdatedRemoteJobs = async (path) => {
   }
 
   return remoteJobs;
+};
+
+getSalaryExpectation = (job) => {
+  let min = job.salary_min;
+  let max = job.salary_max;
+  if (min && max) {
+    return `$${getValueInThousands(min)} - $${getValueInThousands(max)}`;
+  }
+  return;
+};
+
+getValueInThousands = (value) => {
+  return value
+    .toString()
+    .replace(/(\d{1,})(\d{3})$/, (_, prefix, lastThree) => prefix + "k");
 };
 
 module.exports = {

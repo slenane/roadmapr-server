@@ -74,7 +74,11 @@ const userSchema = new Schema({
     id: Number,
     name: String,
   },
-  stack: Array,
+  stack: {
+    id: Number,
+    name: String,
+  },
+  stackList: Array,
   theme: "light" | "dark",
   username: {
     type: String,

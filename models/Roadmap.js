@@ -2,7 +2,14 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const roadmapSchema = new Schema({
-  plan: [Schema.Types.Mixed],
+  path: {
+    id: Number,
+    name: String,
+  },
+  stack: {
+    id: Number,
+    name: String,
+  },
   education: String,
   experience: String,
   projects: String,

@@ -80,9 +80,15 @@ const generateRoadmapData = async (userId, roadmap) => {
     .exec();
 
   const stackList = [
-    ...education.educationList.map((item) => item.stack),
-    ...experience.experienceList.map((item) => item.stack),
-    ...projects.projectList.map((item) => item.stack),
+    ...education.educationList
+      .filter((item) => !!item.startDate)
+      .map((item) => item.stack),
+    ...experience.experienceList
+      .filter((item) => !!item.startDate)
+      .map((item) => item.stack),
+    ...projects.projectList
+      .filter((item) => !!item.startDate)
+      .map((item) => item.stack),
   ].flat(Infinity);
 
   const updatedStack = [];

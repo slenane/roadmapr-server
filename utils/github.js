@@ -7,7 +7,7 @@ const githubDataExpired = (lastUpdate) => {
   return (currentTime - dateObject) / (1000 * 60 * 60) > 24;
 };
 
-const updateUserGithubData = async (user, github, next) => {
+const updateUserGithubData = async (user, github, token, next) => {
   try {
     const roadmap = await Roadmap.findOne({ user });
 
@@ -23,8 +23,11 @@ const updateUserGithubData = async (user, github, next) => {
     if (github) {
       roadmap.github = {
         lastUpdated: new Date(),
+        avatar: github.avatar_url,
+        bio: github.bio,
         url: github.url,
         link: github.html_url,
+        name: github.name,
         login: github.login,
         publicRepos: github.public_repos,
         privateRepos: github.total_private_repos
@@ -32,7 +35,7 @@ const updateUserGithubData = async (user, github, next) => {
           : roadmap.github.privateRepos,
         followers: github.followers,
         reposUrl: github.repos_url,
-        featuredRepo: await getFeaturedRepo(github.repos_url, next),
+        featuredRepo: await getFeaturedRepo(github.repos_url, token, next),
       };
 
       await roadmap.save();
@@ -44,11 +47,12 @@ const updateUserGithubData = async (user, github, next) => {
   }
 };
 
-const getFeaturedRepo = async (url, next) => {
+const getFeaturedRepo = async (url, token, next) => {
   try {
     const repos = await axios({
       url: url + "?sort=pushed&direction=desc&per_page=1",
       method: "GET",
+      ...(token ? { headers: { Authorization: "token" + " " + token } } : {}),
     });
 
     const featuredRepo = [...repos.data][0];
@@ -56,6 +60,7 @@ const getFeaturedRepo = async (url, next) => {
     const repoLanguages = await axios({
       url: featuredRepo.languages_url,
       method: "GET",
+      ...(token ? { headers: { Authorization: "token" + " " + token } } : {}),
     });
 
     return {

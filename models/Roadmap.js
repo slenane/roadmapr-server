@@ -15,7 +15,11 @@ const roadmapSchema = new Schema({
   projects: String,
   github: {
     lastUpdated: Date,
+    avatar: String,
+    name: String,
+    bio: String,
     url: String,
+    link: String,
     login: String,
     publicRepos: Number,
     privateRepos: Number,
@@ -26,7 +30,7 @@ const roadmapSchema = new Schema({
       link: String,
       name: String,
       description: String,
-      languages: [Schema.Types.Mixed],
+      languages: Object,
     },
   },
   user: {

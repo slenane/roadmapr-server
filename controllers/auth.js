@@ -321,6 +321,7 @@ const getGithubUser = async (req, res, next) => {
             await updateUserGithubData(
               existingGithubOAuthUser._id,
               githubUser.data,
+              req.session.token,
               next
             );
 
@@ -338,6 +339,7 @@ const getGithubUser = async (req, res, next) => {
             await updateUserGithubData(
               existingUserMatchingEmail._id,
               githubUser.data,
+              req.session.token,
               next
             );
 
@@ -381,7 +383,12 @@ const getGithubUser = async (req, res, next) => {
             education: education._id,
             projects: projects._id,
             experience: experience._id,
-            github: await updateUserGithubData(user._id, githubUser.data, next),
+            github: await updateUserGithubData(
+              user._id,
+              githubUser.data,
+              req.session.token,
+              next
+            ),
           });
 
           user.experience = experience._id;
@@ -439,7 +446,12 @@ const updateGithubExistingUser = (req, res, next) => {
             throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
           }
 
-          await updateUserGithubData(user._id, githubUser.data, next);
+          await updateUserGithubData(
+            user._id,
+            githubUser.data,
+            req.session.token,
+            next
+          );
 
           user.github = {
             id: githubUser.data.id,

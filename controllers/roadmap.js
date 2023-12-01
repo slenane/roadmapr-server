@@ -6,6 +6,7 @@ const Experience = require("../models/experience/Experience.js");
 const Projects = require("../models/projects/Projects.js");
 const ALERTS = require("../utils/alerts");
 const Http404Error = require("../utils/errorHandling/http404Error.js");
+const { githubDataExpired, updateUserGithubData } = require("../utils/github");
 
 const getRoadmap = async (req, res, next) => {
   const userId = req.auth._id;
@@ -27,7 +28,7 @@ const getRoadmap = async (req, res, next) => {
       await roadmap.save();
     }
 
-    const roadmapData = await generateRoadmapData(userId, roadmap);
+    const roadmapData = await generateRoadmapData(userId, roadmap, next);
 
     res.status(200).json(roadmapData);
   } catch (error) {
@@ -55,7 +56,7 @@ const updateRoadmap = async (req, res, next) => {
 
     await roadmap.save();
 
-    const roadmapData = await generateRoadmapData(userId, roadmap);
+    const roadmapData = await generateRoadmapData(userId, roadmap, next);
 
     res.status(200).json({
       roadmap: roadmapData,
@@ -66,7 +67,7 @@ const updateRoadmap = async (req, res, next) => {
   }
 };
 
-const generateRoadmapData = async (userId, roadmap) => {
+const generateRoadmapData = async (userId, roadmap, next) => {
   const education = await Education.findById(roadmap.education)
     .populate("educationList")
     .exec();
@@ -79,16 +80,35 @@ const generateRoadmapData = async (userId, roadmap) => {
     .populate("projectList")
     .exec();
 
+  await updateStackList(userId, education, experience, projects);
+
+  if (githubDataExpired(roadmap?.github.lastUpdated)) {
+    roadmap.github = await updateUserGithubData(userId, roadmap.github, next);
+  }
+
+  return {
+    path: roadmap.path,
+    stack: roadmap?.stack,
+    education: education?.educationList,
+    experience: experience?.experienceList,
+    projects: projects?.projectList,
+    github: roadmap?.github,
+  };
+};
+
+const getStackList = (itemList) => {
+  return itemList.filter((item) => !!item.startDate).map((item) => item.stack);
+};
+
+const updateStackList = async (userId, education, experience, projects) => {
   const stackList = [
-    ...education.educationList
-      .filter((item) => !!item.startDate)
-      .map((item) => item.stack),
-    ...experience.experienceList
-      .filter((item) => !!item.startDate)
-      .map((item) => item.stack),
-    ...projects.projectList
-      .filter((item) => !!item.startDate)
-      .map((item) => item.stack),
+    ...(education?.educationList.length
+      ? getStackList(education.educationList)
+      : []),
+    ...(experience?.experienceList.length
+      ? getStackList(experience.experienceList)
+      : []),
+    ...(projects?.projectList.length ? getStackList(projects.projectList) : []),
   ].flat(Infinity);
 
   const updatedStack = [];
@@ -104,15 +124,6 @@ const generateRoadmapData = async (userId, roadmap) => {
     { stackList: updatedStack, userId },
     { new: true }
   ).exec();
-
-  return {
-    path: roadmap.path,
-    stack: roadmap.stack,
-    education: education.educationList,
-    experience: experience.experienceList,
-    projects: projects.projectList,
-    github: [],
-  };
 };
 
 module.exports = { getRoadmap, updateRoadmap };

@@ -21,6 +21,7 @@ const ALERTS = require("../utils/alerts");
 const validPasswordRegex =
   /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,20}$/;
 const emailRegex = /^\S+@\S+\.\S+$/;
+const { updateUserGithubData } = require("../utils/github");
 
 const register = async (req, res, next) => {
   try {
@@ -317,6 +318,12 @@ const getGithubUser = async (req, res, next) => {
           });
 
           if (existingGithubOAuthUser) {
+            await updateUserGithubData(
+              existingGithubOAuthUser._id,
+              githubUser.data,
+              next
+            );
+
             const token = existingGithubOAuthUser.generateJwt();
             return res
               .status(200)
@@ -328,6 +335,12 @@ const getGithubUser = async (req, res, next) => {
           });
 
           if (existingUserMatchingEmail) {
+            await updateUserGithubData(
+              existingUserMatchingEmail._id,
+              githubUser.data,
+              next
+            );
+
             existingUserMatchingEmail.github = {
               id: githubUser.data.id,
               username: githubUser.data.login,
@@ -368,6 +381,7 @@ const getGithubUser = async (req, res, next) => {
             education: education._id,
             projects: projects._id,
             experience: experience._id,
+            github: await updateUserGithubData(user._id, githubUser.data, next),
           });
 
           user.experience = experience._id;
@@ -416,7 +430,7 @@ const updateGithubExistingUser = (req, res, next) => {
           });
 
           if (existingUserWithThisGithub) {
-            throw new Http400Error(ALERTS.AUTH.ERROR.GITHUB_LINKED);
+            throw new Http400Error(ALERTS.AUTH.ERROR.GITHUB_USED);
           }
 
           const user = await User.findOne({ _id: req.params.id });
@@ -424,6 +438,8 @@ const updateGithubExistingUser = (req, res, next) => {
           if (!user) {
             throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
           }
+
+          await updateUserGithubData(user._id, githubUser.data, next);
 
           user.github = {
             id: githubUser.data.id,

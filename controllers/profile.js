@@ -50,9 +50,15 @@ const getProfile = async (req, res, next) => {
 
     const updatedUser = {
       ...user.toObject(),
-      educationList: sortItemsByDate(education.educationList),
-      experienceList: sortItemsByDate(experience.experienceList),
-      projectList: sortItemsByDate(projects.projectList),
+      educationList: education?.educationList.length
+        ? sortItemsByDate(education.educationList)
+        : [],
+      experienceList: experience?.experienceList.length
+        ? sortItemsByDate(experience.experienceList)
+        : [],
+      projectList: projects?.projectList.length
+        ? sortItemsByDate(projects.projectList)
+        : [],
     };
 
     res.status(200).json(updatedUser);

@@ -13,6 +13,22 @@ const roadmapSchema = new Schema({
   education: String,
   experience: String,
   projects: String,
+  github: {
+    lastUpdated: Date,
+    url: String,
+    login: String,
+    publicRepos: Number,
+    privateRepos: Number,
+    reposUrl: String,
+    featuredRepo: {
+      createdAt: String,
+      updatedAt: String,
+      link: String,
+      name: String,
+      description: String,
+      languages: [Schema.Types.Mixed],
+    },
+  },
   user: {
     type: Schema.Types.ObjectId,
     ref: "User",

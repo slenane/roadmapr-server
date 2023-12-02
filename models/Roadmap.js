@@ -23,6 +23,8 @@ const roadmapSchema = new Schema({
     login: String,
     publicRepos: Number,
     privateRepos: Number,
+    followers: Number,
+    following: Number,
     reposUrl: String,
     featuredRepo: {
       createdAt: String,

@@ -35,6 +35,8 @@ const updateUserGithubData = async (user, github, token, next) => {
           : roadmap.github.privateRepos,
         followers: github.followers,
         reposUrl: github.repos_url,
+        followers: github.followers,
+        following: github.following,
         featuredRepo: await getFeaturedRepo(github.repos_url, token, next),
       };
 

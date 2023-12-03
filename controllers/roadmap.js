@@ -82,7 +82,7 @@ const generateRoadmapData = async (userId, roadmap, next) => {
 
   await updateStackList(userId, education, experience, projects);
 
-  if (githubDataExpired(roadmap?.github.lastUpdated)) {
+  if (roadmap?.github && githubDataExpired(roadmap?.github.lastUpdated)) {
     roadmap.github = await updateUserGithubData(
       userId,
       roadmap.github,
@@ -97,7 +97,7 @@ const generateRoadmapData = async (userId, roadmap, next) => {
     education: education?.educationList,
     experience: experience?.experienceList,
     projects: projects?.projectList,
-    github: roadmap?.github,
+    ...(roadmap?.github ? { github: roadmap?.github } : {}),
   };
 };
 

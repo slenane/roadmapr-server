@@ -51,28 +51,30 @@ const updateUserGithubData = async (user, github, token, next) => {
 
 const getFeaturedRepo = async (url, token, next) => {
   try {
-    const repos = await axios({
-      url: url + "?sort=pushed&direction=desc&per_page=1",
-      method: "GET",
-      ...(token ? { headers: { Authorization: "token" + " " + token } } : {}),
-    });
+    if (url) {
+      const repos = await axios({
+        url: url + "?sort=pushed&direction=desc&per_page=1",
+        method: "GET",
+        ...(token ? { headers: { Authorization: "token" + " " + token } } : {}),
+      });
 
-    const featuredRepo = [...repos.data][0];
+      const featuredRepo = [...repos.data][0];
 
-    const repoLanguages = await axios({
-      url: featuredRepo.languages_url,
-      method: "GET",
-      ...(token ? { headers: { Authorization: "token" + " " + token } } : {}),
-    });
+      const repoLanguages = await axios({
+        url: featuredRepo.languages_url,
+        method: "GET",
+        ...(token ? { headers: { Authorization: "token" + " " + token } } : {}),
+      });
 
-    return {
-      createdAt: featuredRepo.created_at,
-      updatedAt: featuredRepo.updated_at,
-      link: featuredRepo.html_url,
-      name: featuredRepo.name,
-      description: featuredRepo.description,
-      languages: repoLanguages.data,
-    };
+      return {
+        createdAt: featuredRepo.created_at,
+        updatedAt: featuredRepo.updated_at,
+        link: featuredRepo.html_url,
+        name: featuredRepo.name,
+        description: featuredRepo.description,
+        languages: repoLanguages.data,
+      };
+    }
   } catch (error) {
     next(error);
   }

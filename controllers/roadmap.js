@@ -28,7 +28,12 @@ const getRoadmap = async (req, res, next) => {
       await roadmap.save();
     }
 
-    const roadmapData = await generateRoadmapData(userId, roadmap, next);
+    const roadmapData = await generateRoadmapData(
+      userId,
+      roadmap,
+      req.session?.token,
+      next
+    );
 
     res.status(200).json(roadmapData);
   } catch (error) {
@@ -56,7 +61,12 @@ const updateRoadmap = async (req, res, next) => {
 
     await roadmap.save();
 
-    const roadmapData = await generateRoadmapData(userId, roadmap, next);
+    const roadmapData = await generateRoadmapData(
+      userId,
+      roadmap,
+      req.session?.token,
+      next
+    );
 
     res.status(200).json({
       roadmap: roadmapData,
@@ -67,7 +77,7 @@ const updateRoadmap = async (req, res, next) => {
   }
 };
 
-const generateRoadmapData = async (userId, roadmap, next) => {
+const generateRoadmapData = async (userId, roadmap, token, next) => {
   const education = await Education.findById(roadmap.education)
     .populate("educationList")
     .exec();
@@ -86,7 +96,7 @@ const generateRoadmapData = async (userId, roadmap, next) => {
     roadmap.github = await updateUserGithubData(
       userId,
       roadmap.github,
-      req.session?.token,
+      token,
       next
     );
   }

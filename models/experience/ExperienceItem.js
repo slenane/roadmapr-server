@@ -12,7 +12,7 @@ const experienceItemSchema = Schema({
   role: String,
   stack: Array,
   pinned: Boolean,
-  status: "todo" | "inProgress" | "done",
+  status: "inProgress" | "done",
   position: Number,
   startDate: Date,
   type: String,

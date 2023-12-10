@@ -6,6 +6,7 @@ const ExperienceItem = require("../models/experience/ExperienceItem.js");
 const Experience = require("../models/experience/Experience.js");
 const ProjectItem = require("../models/projects/ProjectItem.js");
 const Projects = require("../models/projects/Projects.js");
+const Roadmap = require("../models/Roadmap.js");
 const Http500Error = require("../utils/errorHandling/http500Error.js");
 const Http404Error = require("../utils/errorHandling/http404Error.js");
 const Http400Error = require("../utils/errorHandling/http400Error.js");
@@ -46,6 +47,47 @@ const updateSettings = async (req, res, next) => {
     if (!user) {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
+
+    const settings = extractSettings(user);
+
+    res
+      .status(200)
+      .json({ settings, successMessage: ALERTS.SETTINGS.SUCCESS.UPDATED });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const removeGithub = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    user.github = {
+      id: "",
+      username: "",
+    };
+
+    await user.save();
+
+    const roadmap = await Roadmap.findOne({ user: id });
+
+    if (!roadmap) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+    
+    roadmap.github = undefined;
+
+    await roadmap.save();
 
     const settings = extractSettings(user);
 
@@ -228,6 +270,7 @@ const extractSettings = (user) => {
 module.exports = {
   getSettings,
   updateSettings,
+  removeGithub,
   updateEmail,
   verifyEmailUpdate,
   updatePassword,

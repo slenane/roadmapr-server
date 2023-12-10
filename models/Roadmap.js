@@ -37,6 +37,7 @@ const roadmapSchema = new Schema({
       },
     },
     default: undefined,
+    required: false,
   },
   user: {
     type: Schema.Types.ObjectId,

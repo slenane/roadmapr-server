@@ -2,6 +2,7 @@ const express = require("express");
 const {
   getSettings,
   updateSettings,
+  removeGithub,
   updateEmail,
   verifyEmailUpdate,
   updatePassword,
@@ -21,6 +22,7 @@ const router = express.Router();
 
 router.get("", isAuth, getSettings);
 router.patch("/edit/:id", isAuth, getSettingsRules(), sanitize, updateSettings);
+router.patch("/remove-github/:id", isAuth, removeGithub);
 router.patch(
   "/update-email/:id",
   isAuth,
@@ -28,11 +30,7 @@ router.patch(
   sanitize,
   updateEmail
 );
-router.get(
-  "/verify-email-update",
-
-  verifyEmailUpdate
-);
+router.get("/verify-email-update", verifyEmailUpdate);
 router.patch(
   "/update-password/:id",
   isAuth,

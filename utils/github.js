@@ -1,5 +1,7 @@
 const Roadmap = require("../models/Roadmap.js");
 const axios = require("axios");
+const Http404Error = require("../utils/errorHandling/http404Error.js");
+const ALERTS = require("../utils/alerts");
 
 const githubDataExpired = (lastUpdate) => {
   const dateObject = new Date(lastUpdate).getTime();
@@ -9,7 +11,11 @@ const githubDataExpired = (lastUpdate) => {
 
 const updateUserGithubData = async (user, github, token, next) => {
   try {
-    const roadmap = await Roadmap.findOne({ user });
+    const roadmap = await Roadmap.findOne({ user: user });
+
+    if (!roadmap) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
 
     if (github.lastUpdated) {
       const githubResponse = await axios({

@@ -228,7 +228,7 @@ const isUniqueUsername = async (req, res, next) => {
       throw new Http400Error(ALERTS.NO_INFORMATION_PROVIDED);
     }
 
-    const user = await User.exists({ email: req.params.email });
+    const user = await User.exists({ username: req.params.username });
 
     if (user) res.status(200).json({ notUnique: true });
     else res.status(200).json(null);

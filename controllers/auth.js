@@ -383,12 +383,6 @@ const getGithubUser = async (req, res, next) => {
             education: education._id,
             projects: projects._id,
             experience: experience._id,
-            github: await updateUserGithubData(
-              user._id,
-              githubUser.data,
-              req.session.token,
-              next
-            ),
           });
 
           user.experience = experience._id;
@@ -401,6 +395,13 @@ const getGithubUser = async (req, res, next) => {
           await projects.save();
           await roadmap.save();
           await user.save();
+
+          await updateUserGithubData(
+            user._id,
+            githubUser.data,
+            req.session.token,
+            next
+          );
 
           const token = user.generateJwt();
           return res.status(200).json({ token, user });

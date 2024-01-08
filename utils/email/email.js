@@ -1,4 +1,5 @@
-const config = require("../config");
+const config = require("../../config");
+const { EN, ES, PT } = require("./emailConfig");
 
 const API_VERSION = { apiVersion: "2010-12-01" };
 
@@ -39,7 +40,11 @@ const defaultMail = {
   ],
 };
 
-const getVerificationEmail = (userEmail, verificationLink) => {
+const getVerificationEmail = (userEmail, verificationLink, language) => {
+  let verificationEmail = EN.verificationEmail;
+  if (language === "es") verificationEmail = ES.verificationEmail;
+  if (language === "pt") verificationEmail = PT.verificationEmail;
+
   return {
     Destination: {
       ToAddresses: [userEmail],
@@ -84,25 +89,24 @@ const getVerificationEmail = (userEmail, verificationLink) => {
                   alt="logo"
                 />
             
-                <h1>Welcome to roadmapr</h1>
+                <h1>${verificationEmail.html.header}</h1>
             </header> 
         
             <main>
-                <p>Thank you for registering with roadmapr, where you can create your own personal roadmap to a career in software development.</p>
+                <p>${verificationEmail.html.main.p1}</p>
         
-                <p>Click the button below to verify your email address.</p>
+                <p>${verificationEmail.html.main.p2}</p>
             
                 <a href="${verificationLink}">
-                  <button class="verify-button">Verify Email</button>
+                  <button class="verify-button">${verificationEmail.html.main.button}</button>
                 </a>
         
-                <p>If this wasn't you, please ignore this email.</p>
+                <p>${verificationEmail.html.main.p3}</p>
             </main>
         
             <footer>
-                <small>Registered trademark</small>
-        
-            </foot>
+                <small>${verificationEmail.html.footer}</small>
+            </footer>
           </body>
         </html>
               `,
@@ -110,28 +114,28 @@ const getVerificationEmail = (userEmail, verificationLink) => {
         Text: {
           Charset: "UTF-8",
           Data: `
-              Welcome to roadmapr
-              Thank you for registering with roadmapr, where you can create your own personal roadmap to a career in software development.
-              Please copy and paste the text below to your browser to verify your email.
+              ${verificationEmail.text.p1}
               
               ${verificationLink}
 
-              If this wasn't you, please ignore this email.
-              
-              Registered trademark
+              ${verificationEmail.text.p2}
               `,
         },
       },
       Subject: {
         Charset: "UTF-8",
-        Data: "Welcome to roadmapr - Verify your email",
+        Data: verificationEmail.subject,
       },
     },
     Source: config.EMAIL_ADDRESS,
   };
 };
 
-const getPasswordResetEmail = (userEmail, verificationLink) => {
+const getPasswordResetEmail = (userEmail, verificationLink, language) => {
+  let resetPassword = EN.resetPassword;
+  if (language === "es") resetPassword = ES.resetPassword;
+  if (language === "pt") resetPassword = PT.resetPassword;
+
   return {
     Destination: {
       ToAddresses: [userEmail],
@@ -176,23 +180,23 @@ const getPasswordResetEmail = (userEmail, verificationLink) => {
                   alt="logo"
                 />
             
-                <h1>Reset Password</h1>
+                <h1>${resetPassword.html.header}</h1>
             </header> 
         
             <main>
-                <p>A request has been made to reset your roadmapr password.</p>
+                <p>${resetPassword.html.main.p1}</p>
         
-                <p>Click the button below to verify your email and set a new password.</p>
+                <p>${resetPassword.html.main.p2}</p>
             
                 <a href="${verificationLink}">
-                  <button class="verify-button">Verify Email</button>
+                  <button class="verify-button">${resetPassword.html.main.button}</button>
                 </a>
         
-                <p>If this wasn't you, please ignore this email.</p>
+                <p>${resetPassword.html.main.p3}</p>
             </main>
         
             <footer>
-                <small>Registered trademark</small>
+                <small>${resetPassword.html.footer}</small>
         
             </foot>
           </body>
@@ -202,28 +206,29 @@ const getPasswordResetEmail = (userEmail, verificationLink) => {
         Text: {
           Charset: "UTF-8",
           Data: `
-          Reset Password
-          A request has been made to reset your roadmapr password.
-              Please copy and paste the text below to your browser to verify your email and set a new password.
-              
-              ${verificationLink}
+            ${resetPassword.text.p1}
+            
+            ${verificationLink}
 
-              If this wasn't you, please ignore this email.
-              
-              Registered trademark
-              `,
+            ${resetPassword.text.p2}
+            `,
         },
       },
       Subject: {
         Charset: "UTF-8",
-        Data: "roadmapr - Reset password",
+        Data: resetPassword.subject,
       },
     },
     Source: config.EMAIL_ADDRESS,
   };
 };
 
-const getEmailUpdateVerification = (userEmail, verificationLink) => {
+const getEmailUpdateVerification = (userEmail, verificationLink, language) => {
+  console.log(language);
+  let emailUpdate = EN.emailUpdate;
+  if (language === "es") emailUpdate = ES.emailUpdate;
+  if (language === "pt") emailUpdate = PT.emailUpdate;
+
   return {
     Destination: {
       ToAddresses: [userEmail],
@@ -268,23 +273,23 @@ const getEmailUpdateVerification = (userEmail, verificationLink) => {
                   alt="logo"
                 />
             
-                <h1>Verify Email Update</h1>
+                <h1>${emailUpdate.html.header}</h1>
             </header> 
         
             <main>
-                <p>A request has been made to set this email address as the primary email for a roadmapr user.</p>
+                <p>${emailUpdate.html.main.p1}</p>
         
-                <p>Click the button below to verify your email address.</p>
+                <p>${emailUpdate.html.main.p2}</p>
             
                 <a href="${verificationLink}">
-                  <button class="verify-button">Verify Email</button>
+                  <button class="verify-button">${emailUpdate.html.main.button}</button>
                 </a>
         
-                <p>If this wasn't you, please ignore this email.</p>
+                <p>${emailUpdate.html.main.p3}</p>
             </main>
         
             <footer>
-                <small>Registered trademark</small>
+                <small>${emailUpdate.html.footer}</small>
         
             </foot>
           </body>
@@ -294,21 +299,17 @@ const getEmailUpdateVerification = (userEmail, verificationLink) => {
         Text: {
           Charset: "UTF-8",
           Data: `
-              Verify Email Update
-              A request has been made to set this email address as the primary email for a roadmapr user.
-              Please copy and paste the text below to your browser to verify your email address.
+              ${emailUpdate.text.p1}
               
               ${verificationLink}
 
-              If this wasn't you, please ignore this email.
-              
-              Registered trademark
+              ${emailUpdate.text.p2}
               `,
         },
       },
       Subject: {
         Charset: "UTF-8",
-        Data: "roadmapr - Verify email update",
+        Data: emailUpdate.subject,
       },
     },
     Source: config.EMAIL_ADDRESS,

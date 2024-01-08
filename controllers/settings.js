@@ -13,7 +13,7 @@ const Http400Error = require("../utils/errorHandling/http400Error.js");
 const ALERTS = require("../utils/alerts.js");
 const config = require("../config");
 const crypto = require("crypto");
-const { getEmailUpdateVerification } = require("../utils/amazonSes");
+const { getEmailUpdateVerification } = require("../utils/email/email.js");
 const AWS = require("aws-sdk");
 AWS.config.update({ region: config.AWS_BUCKET_REGION });
 
@@ -84,7 +84,7 @@ const removeGithub = async (req, res, next) => {
     if (!roadmap) {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
-    
+
     roadmap.github = undefined;
 
     await roadmap.save();
@@ -116,7 +116,8 @@ const updateEmail = async (req, res, next) => {
     const verificationLink = `http://${req.headers.host}/api/settings/verify-email-update?token=${user.emailVerification.emailToken}`;
     const verificationEmail = getEmailUpdateVerification(
       user.emailVerification.updatedEmail,
-      verificationLink
+      verificationLink,
+      req.body.preferredLanguage
     );
     const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
       .sendEmail(verificationEmail)

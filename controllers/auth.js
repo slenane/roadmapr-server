@@ -11,7 +11,7 @@ const {
   API_VERSION,
   getVerificationEmail,
   getPasswordResetEmail,
-} = require("../utils/amazonSes");
+} = require("../utils/email/email.js");
 const AWS = require("aws-sdk");
 AWS.config.update({ region: config.AWS_BUCKET_REGION });
 const Http400Error = require("../utils/errorHandling/http400Error");
@@ -38,7 +38,7 @@ const register = async (req, res, next) => {
     }
 
     const user = new User({
-      preferredLanguage: "en",
+      preferredLanguage: req.body.preferredLanguage,
       theme: "dark",
       email: req.body.email,
       emailVerification: {
@@ -76,7 +76,8 @@ const register = async (req, res, next) => {
     const verificationLink = `http://${req.headers.host}/api/auth/verify-email?token=${user.emailVerification.emailToken}`;
     const verificationEmail = getVerificationEmail(
       req.body.email,
-      verificationLink
+      verificationLink,
+      req.body.preferredLanguage
     );
     const sendPromise = new AWS.SES(API_VERSION)
       .sendEmail(verificationEmail)
@@ -156,7 +157,8 @@ const sendResetPasswordEmail = async (req, res, next) => {
     const verificationLink = `http://${req.headers.host}/api/auth/verify-reset-password?token=${user.emailVerification.emailResetPasswordToken}`;
     const verificationEmail = getPasswordResetEmail(
       req.params.email,
-      verificationLink
+      verificationLink,
+      req.params.preferredLanguage
     );
     const sendPromise = new AWS.SES(API_VERSION)
       .sendEmail(verificationEmail)

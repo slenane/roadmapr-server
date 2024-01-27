@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon index.js"
   },
-  "author": "Stephen Lenane <info@stephenlenane.com>",
+  "author": "Stephen Lenane <info@roadmapr.dev>",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1472.0",

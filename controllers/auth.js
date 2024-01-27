@@ -110,7 +110,7 @@ const verifyEmail = async (req, res) => {
     user.emailVerification.isVerified = true;
     await user.save();
 
-    res.redirect("http://localhost:4200/login?verified=true");
+    res.redirect(config.ENVIRONMENT.clientUrl + "/login?verified=true");
   } catch (error) {
     next(error);
   }
@@ -187,7 +187,7 @@ const verifyPasswordReset = async (req, res, next) => {
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
     res.redirect(
-      `http://localhost:4200/reset-password?token=${user.emailVerification.emailResetPasswordToken}`
+      `${config.ENVIRONMENT}/reset-password?token=${user.emailVerification.emailResetPasswordToken}`
     );
   } catch (error) {
     next(error);

@@ -60,7 +60,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   cors({
-    origin: ["http://localhost:4200"],
+    origin: [config.ENVIRONMENT.clientUrl],
     methods: ["GET", "PUT", "POST", "DELETE"],
   })
 );

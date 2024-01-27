@@ -155,7 +155,7 @@ const verifyEmailUpdate = async (req, res) => {
 
     await user.save();
 
-    res.redirect("http://localhost:4200/login?verified=true");
+    res.redirect(config.ENVIRONMENT.clientUrl + "/login?verified=true");
   } catch (error) {
     next(error);
   }

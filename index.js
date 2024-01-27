@@ -11,6 +11,7 @@ const cors = require("cors");
 const config = require("./config");
 const mongoose = require("mongoose");
 const passport = require("passport");
+const helmet = require("helmet");
 const {
   logError,
   logErrorMiddleware,
@@ -53,11 +54,12 @@ app.use(passport.initialize());
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
+app.use(helmet());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("client"));
 app.use(
   cors({
     origin: [config.ENVIRONMENT.clientUrl],

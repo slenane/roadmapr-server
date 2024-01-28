@@ -1,7 +1,7 @@
 // APP SETUP
 const express = require("express");
 const session = require("express-session");
-const User = require("./models/User");
+const MongoStore = require("connect-mongo")(session);
 const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -34,12 +34,6 @@ const recommendationsRoutes = require("./routes/recommendations.js");
 
 // DATABASE SETUP
 const MONGODB_URI = config.DB_CONNECTION_URL;
-// Session store with mongo
-// const mongoStore = new MongoDBStore({
-//   uri: MONGODB_URI,
-//   collection: "sessions",
-// });
-
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -99,6 +93,7 @@ app.use(
     secret: config.DB_SECRET, // You should use a secure, random secret in production
     resave: false,
     saveUninitialized: true,
+    store: new MongoStore({ url: config.MONGODB_URI }),
   })
 );
 

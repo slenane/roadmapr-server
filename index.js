@@ -54,15 +54,36 @@ app.use(passport.initialize());
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
+      scriptSrc: [
+        "'self'",
+        "https://www.googletagmanager.com",
+        config.ENVIRONMENT.apiUrl,
+      ],
+      connectSrc: ["'self'", "https://region1.google-analytics.com"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://roadmapr-s3-bucket.s3.eu-north-1.amazonaws.com",
+        "https://ghchart.rshah.org",
+        "https://avatars.githubusercontent.com",
+      ],
+    },
+  })
+);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static("client"));
+app.use(express.static(path.join(__dirname, "client")));
 app.use(
   cors({
-    origin: [config.ENVIRONMENT.clientUrl],
+    origin: [config.ENVIRONMENT.apiUrl],
     methods: ["GET", "PUT", "POST", "DELETE"],
   })
 );
@@ -90,6 +111,10 @@ app.use("/api/education", educationRoutes);
 app.use("/api/projects", projectsRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/recommendations", recommendationsRoutes);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/index.html"));
+});
 
 // ERROR HANDLERS
 app.use(logErrorMiddleware);

@@ -6,8 +6,7 @@ const environments = {
     clientUrl: "http://localhost:4200",
   },
   production: {
-    apiUrl: "https://www.roadmapr.dev/api",
-    clientUrl: "https://www.roadmapr.dev/",
+    apiUrl: "https://www.roadmapr.dev",
   },
 };
 

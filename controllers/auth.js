@@ -110,7 +110,7 @@ const verifyEmail = async (req, res) => {
     user.emailVerification.isVerified = true;
     await user.save();
 
-    res.redirect(config.ENVIRONMENT.clientUrl + "/login?verified=true");
+    res.redirect(config.ENVIRONMENT.apiUrl + "/login?verified=true");
   } catch (error) {
     next(error);
   }

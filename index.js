@@ -1,7 +1,7 @@
 // APP SETUP
 const express = require("express");
 const session = require("express-session");
-const MongoStore = require("connect-mongo");
+const MongoStore = require("connect-mongo")(session);
 const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -93,7 +93,7 @@ app.use(
     secret: config.DB_SECRET, // You should use a secure, random secret in production
     resave: false,
     saveUninitialized: true,
-    store: MongoStore.create({ mongoUrl: config.MONGODB_URI }),
+    store: new MongoStore({ url: config.MONGODB_URI }),
   })
 );
 

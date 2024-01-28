@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Server for RoadMapr application",
   "main": "index.js",
+  "engines": {
+    "node": "18"
+  },
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "author": "Stephen Lenane <info@roadmapr.dev>",
   "license": "ISC",

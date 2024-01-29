@@ -257,26 +257,26 @@
     "TAGLINE": "Your personal roadmap to a career in software development",
     "DESCRIPTION": {
       "T": "What is roadmapr?",
-      "P1": "roadmapr is a self-taught developer made, free-to-use service that aims to grow the self-taught developer community.",
-      "P2": "As a self-taught developer, it can be difficult to know if you are on the right path. So we developed a platform to track and share your progress while receiving recommendations from users in your country who have become professional developers."
+      "P1": "roadmapr is a free-to-use platform designed for self-taught developers to organize and track their progress while receiving recommendations from users who have become professional developers.",
+      "P2": "Our aim is to provide a clear path to becoming a professional developer by curating recommendations from a global network of users. Based on these suggestions, you can construct your own personal roadmap, stay focused, and achieve your goal."
     },
     "EDUCATION": {
       "T": "Track and share your progress",
-      "P1": "Build your personal roadmap by adding your education, projects and work experience to get a full picture of your progress",
-      "P2": "Receive recommendations from users who have successfully secured positions with a similar tech stack and location",
-      "P3": "Browse the latest remote opportunities to help you stay focused on your goal"
+      "P1": "Build your personal roadmap by adding your education, projects and work experience to get a full picture of your progress.",
+      "P2": "Receive recommendations from users who have successfully secured positions with a similar tech stack and location.",
+      "P3": "Browse the latest remote opportunities to help you stay focused on your goal."
     },
     "RESUME": {
       "T": "Build your resume",
-      "P1": "View your progress in a resume style, making it easier to apply for jobs",
-      "P2": "Add descriptions of each item to make it easy to remember what your learned when it comes time for an interview",
-      "P3": "Stand out from other candidates by including all the courses you have taken and the projects you have built"
+      "P1": "View your progress in a resume style, making it easier to apply for jobs.",
+      "P2": "Add descriptions of each item to make it easy to remember what your learned when it comes time for an interview.",
+      "P3": "Stand out from other candidates by including all the courses you have taken and the projects you have built."
     },
     "ROADMAP": {
       "T": "View your progress in real time",
-      "P1": "Select a programming stack and build your skills to secure a position as a professional developer",
-      "P2": "Track your progress, gain insights on the type of developer you are and identify areas for improvement",
-      "P3": "Integrate your GitHub account to monitor your repositories and contributions seamlessly"
+      "P1": "Select a programming stack and build your skills to secure a position as a professional developer.",
+      "P2": "Track your progress, gain insights on the type of developer you are and identify areas for improvement.",
+      "P3": "Integrate your GitHub account to monitor your repositories and contributions seamlessly."
     },
     "CTA": {
       "T": "Start your journey to a career in software development today",

@@ -72,6 +72,7 @@ app.use(
         "https://roadmapr-s3-bucket.s3.eu-north-1.amazonaws.com",
         "https://ghchart.rshah.org",
         "https://avatars.githubusercontent.com",
+        "blob:",
       ],
     },
   })

@@ -12,8 +12,6 @@ const {
   getVerificationEmail,
   getPasswordResetEmail,
 } = require("../utils/email/email.js");
-const AWS = require("aws-sdk");
-AWS.config.update({ region: config.AWS_BUCKET_REGION });
 const Http400Error = require("../utils/errorHandling/http400Error");
 const Http404Error = require("../utils/errorHandling/http404Error");
 const Http500Error = require("../utils/errorHandling/http500Error");
@@ -22,6 +20,8 @@ const validPasswordRegex =
   /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,20}$/;
 const emailRegex = /^\S+@\S+\.\S+$/;
 const { updateUserGithubData } = require("../utils/github");
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const register = async (req, res, next) => {
   try {
@@ -79,14 +79,11 @@ const register = async (req, res, next) => {
       verificationLink,
       req.body.preferredLanguage
     );
-    const sendPromise = new AWS.SES(API_VERSION)
-      .sendEmail(verificationEmail)
-      .promise();
 
-    // Handle promise's fulfilled/rejected states
-    sendPromise
-      .then((data) => {
-        res.status(200).json({ successMessage: data.MessageId });
+    sgMail
+      .send(verificationEmail)
+      .then(() => {
+        res.status(200).json({ successMessage: "Verification Email Sent" });
       })
       .catch((error) => {
         next(error);
@@ -160,14 +157,11 @@ const sendResetPasswordEmail = async (req, res, next) => {
       verificationLink,
       req.params.preferredLanguage
     );
-    const sendPromise = new AWS.SES(API_VERSION)
-      .sendEmail(verificationEmail)
-      .promise();
 
-    // Handle promise's fulfilled/rejected states
-    sendPromise
-      .then((data) => {
-        res.status(200).json({ successMessage: data.MessageId });
+    sgMail
+      .send(verificationEmail)
+      .then(() => {
+        res.status(200).json({ successMessage: "Verification Email Sent" });
       })
       .catch((error) => {
         next(error);

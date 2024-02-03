@@ -14,8 +14,8 @@ const ALERTS = require("../utils/alerts.js");
 const config = require("../config");
 const crypto = require("crypto");
 const { getEmailUpdateVerification } = require("../utils/email/email.js");
-const AWS = require("aws-sdk");
-AWS.config.update({ region: config.AWS_BUCKET_REGION });
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const getSettings = async (req, res, next) => {
   try {
@@ -119,13 +119,10 @@ const updateEmail = async (req, res, next) => {
       verificationLink,
       req.body.preferredLanguage
     );
-    const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
-      .sendEmail(verificationEmail)
-      .promise();
 
-    // Handle promise's fulfilled/rejected states
-    sendPromise
-      .then((data) => {
+    sgMail
+      .send(verificationEmail)
+      .then(() => {
         res.status(200).json({
           successMessage: ALERTS.AUTH.SUCCESS.EMAIL_VERIFICATION,
           successValue: user.emailVerification.updatedEmail,

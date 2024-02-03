@@ -12,6 +12,7 @@
   "author": "Stephen Lenane <info@roadmapr.dev>",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^8.1.0",
     "aws-sdk": "^2.1472.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",

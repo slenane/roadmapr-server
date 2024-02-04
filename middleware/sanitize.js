@@ -135,6 +135,10 @@ const getRegistrationRules = () => {
   return [rules.email, rules.password];
 };
 
+const getResendRegistrationEmailRules = () => {
+  return [rules.email];
+};
+
 const getLoginRules = () => {
   return [rules.email, rules.password];
 };
@@ -267,6 +271,7 @@ const sanitize = (req, res, next) => {
 
 module.exports = {
   getRegistrationRules,
+  getResendRegistrationEmailRules,
   getLoginRules,
   getResetPasswordRules,
   getEducationRules,

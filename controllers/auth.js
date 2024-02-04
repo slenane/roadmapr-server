@@ -72,12 +72,41 @@ const register = async (req, res, next) => {
     await roadmap.save();
     await user.save();
 
-    // Create the promise and SES service object
     const verificationLink = `http://${req.headers.host}/api/auth/verify-email?token=${user.emailVerification.emailToken}`;
     const verificationEmail = getVerificationEmail(
       req.body.email,
       verificationLink,
       req.body.preferredLanguage
+    );
+
+    sgMail
+      .send(verificationEmail)
+      .then(() => {
+        res.status(200).json({ successMessage: "Verification Email Sent" });
+      })
+      .catch((error) => {
+        next(error);
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resendRegisterEmail = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      email: req.body.email,
+    });
+
+    if (!user) {
+      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    }
+
+    const verificationLink = `http://${req.headers.host}/api/auth/verify-email?token=${user.emailVerification.emailToken}`;
+    const verificationEmail = getVerificationEmail(
+      user.email,
+      verificationLink,
+      user.preferredLanguage
     );
 
     sgMail
@@ -481,6 +510,7 @@ const logout = (req, res) => {
 
 module.exports = {
   register,
+  resendRegisterEmail,
   verifyEmail,
   login,
   sendResetPasswordEmail,

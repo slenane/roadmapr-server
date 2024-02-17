@@ -63,11 +63,7 @@ app.use(
         "https://www.googletagmanager.com",
         config.ENVIRONMENT.apiUrl,
       ],
-      connectSrc: [
-        "'self'",
-        "https://region1.google-analytics.com",
-        config.ENVIRONMENT.apiUrl + " SameSite=None;Secure",
-      ],
+      connectSrc: ["'self'", "https://region1.google-analytics.com"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: [
         "'self'",

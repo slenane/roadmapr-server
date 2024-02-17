@@ -392,7 +392,7 @@ const getGithubUser = async (req, res, next) => {
               id: githubUser.data.id,
               username: githubUser.data.login,
             },
-            email: githubUser.data.email,
+            ...(githubUser.data?.email && { email: githubUser.data.email }),
             username: existingUserMatchingUsername
               ? githubUser.data.login +
                 (Math.floor(Math.random() * 90000) + 10000)

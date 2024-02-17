@@ -7,6 +7,14 @@ const {
   getUpdatedRemoteJobs,
 } = require("../utils/recommendations/remoteJobs.js");
 
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
 const getRecommendations = async (req, res, next) => {
   try {
     const user = await User.findById(req.auth._id);
@@ -30,9 +38,10 @@ const getRecommendations = async (req, res, next) => {
       ],
     });
 
+    const maxValue = recommendations.length >= 50 ? 50 : recommendations.length;
     const userRecommendations = recommendations
       .filter((recommendation) => {
-        return !educationMetadata.find((item) => {
+        return educationMetadata.find((item) => {
           return (
             item.provider === recommendation.internal.provider &&
             item.title === recommendation.internal.title
@@ -56,9 +65,11 @@ const getRecommendations = async (req, res, next) => {
 
         return matchesB - matchesA;
       })
-      .splice(0, 3);
+      .splice(0, maxValue);
 
-    res.status(200).json(userRecommendations);
+    const shuffledArray = shuffleArray(userRecommendations).splice(0, 5);
+
+    res.status(200).json(shuffledArray);
   } catch (error) {
     next(error);
   }

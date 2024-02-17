@@ -41,7 +41,7 @@ const getRecommendations = async (req, res, next) => {
     const maxValue = recommendations.length >= 50 ? 50 : recommendations.length;
     const userRecommendations = recommendations
       .filter((recommendation) => {
-        return educationMetadata.find((item) => {
+        return !educationMetadata.find((item) => {
           return (
             item.provider === recommendation.internal.provider &&
             item.title === recommendation.internal.title

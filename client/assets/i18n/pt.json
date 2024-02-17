@@ -10,6 +10,7 @@
   },
   "ROUTES": {
     "LANDING": "roadmapr",
+    "PRIVACY_POLICY": "Política de Privacidade | roadmapr",
     "LOGIN": "Entrar | roadmapr",
     "BLOG": "Blog | roadmapr",
     "ABOUT": "Sobre | roadmapr",
@@ -529,6 +530,49 @@
       "USERNAME": "Atualizar Nome de Usuário",
       "GITHUB": "Vincular Conta do GitHub",
       "UPDATE_DATES": "Atualizar Datas"
+    }
+  },
+  "PRIVACY_POLICY": {
+    "TITLE": "Política de Privacidade para roadmapr",
+    "DESCRIPTION": "Esta Política de Privacidade descreve como suas informações pessoais são coletadas, usadas e compartilhadas quando você usa o aplicativo roadmapr.",
+    "INFORMATION_WE_COLLECT": {
+      "TITLE": "1. Informações que Coletamos",
+      "DESCRIPTION": "Ao usar o roadmapr, automaticamente coletamos certas informações sobre seu dispositivo, incluindo informações sobre seu navegador da web, endereço IP, fuso horário e alguns dos cookies instalados em seu dispositivo. Além disso, ao usar o roadmapr, coletamos informações sobre as tarefas e projetos individuais que você insere no aplicativo."
+    },
+    "HOW_WE_USE_YOUR_INFORMATION": {
+      "TITLE": "2. Como Usamos Suas Informações",
+      "DESCRIPTION": "Usamos as informações coletadas para fornecer e operar os serviços do roadmapr. Isso inclui gerenciar contas de usuário, fornecer suporte ao cliente e melhorar e otimizar nosso aplicativo. Além disso, podemos usar suas informações para nos comunicarmos com você, incluindo o envio de e-mails com atualizações e informações sobre o roadmapr."
+    },
+    "SHARING_YOUR_INFORMATION": {
+      "TITLE": "3. Compartilhamento de Suas Informações",
+      "DESCRIPTION": "Não compartilhamos suas informações pessoais com terceiros, exceto na medida do necessário para fornecer os serviços oferecidos pelo roadmapr. No entanto, podemos compartilhar informações anonimizadas e agregadas com terceiros para fins de análise de padrões e tendências de uso."
+    },
+    "DATA_RETENTION": {
+      "TITLE": "4. Retenção de Dados",
+      "DESCRIPTION": "Manteremos suas informações pessoais apenas pelo tempo necessário para cumprir os fins descritos nesta Política de Privacidade. Quando você excluir sua conta ou remover tarefas e projetos específicos do roadmapr, excluiremos essas informações de nossos servidores."
+    },
+    "SECURITY": {
+      "TITLE": "5. Segurança",
+      "DESCRIPTION": "Comprometemo-nos a garantir que suas informações estejam seguras. Utilizamos medidas de segurança padrão do setor para proteger suas informações pessoais contra acesso não autorizado, divulgação, alteração ou destruição."
+    },
+    "YOUR_RIGHTS": {
+      "TITLE": "6. Seus Direitos",
+      "DESCRIPTION": "Você tem o direito de acessar as informações pessoais que temos sobre você e de solicitar que suas informações pessoais sejam corrigidas, atualizadas ou excluídas. Se você deseja exercer esse direito, entre em contato conosco através das informações de contato fornecidas abaixo."
+    },
+    "CHANGES_TO_POLICY": {
+      "TITLE": "7. Alterações a esta Política de Privacidade",
+      "DESCRIPTION": "Podemos atualizar esta Política de Privacidade periodicamente para refletir, por exemplo, mudanças em nossas práticas ou por outros motivos operacionais, legais ou regulatórios."
+    },
+    "CONTACT_US": {
+      "TITLE": "8. Entre em Contato",
+      "DESCRIPTION": "Para obter mais informações sobre nossas práticas de privacidade, se tiver dúvidas ou se desejar fazer uma reclamação, entre em contato conosco por e-mail em info@roadmapr.com."
+    },
+    "AGREEMENT": "Ao usar o roadmapr, você concorda com a coleta e o uso de informações de acordo com esta política.",
+    "COOKIE_CONSENT": {
+      "MESSAGE": "Este site usa cookies para garantir que você obtenha a melhor experiência em nosso site.",
+      "LEARN_MORE": "Saiba mais",
+      "ACCEPT": "Entendi!",
+      "PRIVACY_POLICY": "Política de Privacidade"
     }
   },
   "PROFILE": {

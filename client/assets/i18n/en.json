@@ -10,6 +10,7 @@
   },
   "ROUTES": {
     "LANDING": "roadmapr",
+    "PRIVACY_POLICY": "Privacy Policy | roadmapr",
     "LOGIN": "Log in | roadmapr",
     "REGISTER": "Register | roadmapr",
     "BLOG": "Blog | roadmapr",
@@ -529,6 +530,49 @@
       "USERNAME": "Update Username",
       "GITHUB": "Link GitHub Account",
       "UPDATE_DATES": "Update Dates"
+    }
+  },
+  "PRIVACY_POLICY": {
+    "TITLE": "Privacy Policy for roadmapr",
+    "DESCRIPTION": "This Privacy Policy describes how your personal information is collected, used, and shared when you use the roadmapr application.",
+    "INFORMATION_WE_COLLECT": {
+      "TITLE": "1. Information We Collect",
+      "DESCRIPTION": "When you use roadmapr, we automatically collect certain information about your device, including information about your web browser, IP address, time zone, and some of the cookies that are installed on your device. Additionally, as you use roadmapr, we collect information about the individual tasks and projects you input into the application."
+    },
+    "HOW_WE_USE_YOUR_INFORMATION": {
+      "TITLE": "2. How We Use Your Information",
+      "DESCRIPTION": "We use the information collected to provide and operate the services of roadmapr. This includes managing user accounts, providing customer support, and improving and optimizing our App. Additionally, we may use your information to communicate with you, including sending you emails with updates and information about roadmapr."
+    },
+    "SHARING_YOUR_INFORMATION": {
+      "TITLE": "3. Sharing Your Information",
+      "DESCRIPTION": "We do not share your personal information with third parties except to the extent necessary to provide the services offered by roadmapr. However, we may share anonymized and aggregated information with third parties for the purpose of analyzing usage patterns and trends."
+    },
+    "DATA_RETENTION": {
+      "TITLE": "4. Data Retention",
+      "DESCRIPTION": "We will retain your personal information only for as long as necessary to fulfill the purposes outlined in this Privacy Policy. When you delete your account or remove specific tasks and projects from roadmapr, we will delete this information from our servers."
+    },
+    "SECURITY": {
+      "TITLE": "5. Security",
+      "DESCRIPTION": "We are committed to ensuring that your information is secure. We use industry-standard security measures to protect your personal information from unauthorized access, disclosure, alteration, or destruction."
+    },
+    "YOUR_RIGHTS": {
+      "TITLE": "6. Your Rights",
+      "DESCRIPTION": "You have the right to access the personal information we hold about you and to ask that your personal information be corrected, updated, or deleted. If you would like to exercise this right, please contact us through the contact information provided below."
+    },
+    "CHANGES_TO_POLICY": {
+      "TITLE": "7. Changes to This Privacy Policy",
+      "DESCRIPTION": "We may update this Privacy Policy from time to time in order to reflect, for example, changes to our practices or for other operational, legal, or regulatory reasons."
+    },
+    "CONTACT_US": {
+      "TITLE": "8. Contact Us",
+      "DESCRIPTION": "For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by email at info@roadmapr.com."
+    },
+    "AGREEMENT": "By using roadmapr, you agree to the collection and use of information in accordance with this policy.",
+    "COOKIE_CONSENT": {
+      "MESSAGE": "This website uses cookies to ensure you get the best experience on our website.",
+      "LEARN_MORE": "Learn more",
+      "ACCEPT": "Got it!",
+      "PRIVACY_POLICY": "Privacy Policy"
     }
   },
   "PROFILE": {

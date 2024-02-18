@@ -105,6 +105,24 @@ app.use(
 );
 
 // ROUTES
+// Redirect HTTP requests to HTTPS
+app.use((req, res, next) => {
+  if (!req.secure && req.get("X-Forwarded-Proto") !== "https") {
+    return res.redirect("https://" + req.get("Host") + req.url);
+  }
+  next();
+});
+
+// Handle www and non-www redirection
+app.use((req, res, next) => {
+  const host = req.get("Host");
+  if (host.startsWith("www.")) {
+    const redirectHost = host.substring(4); // Remove 'www.' from the beginning
+    return res.redirect(301, "https://" + redirectHost + req.url);
+  }
+  next();
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/roadmap", roadmapRoutes);
 app.use("/api/experience", experienceRoutes);

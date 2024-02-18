@@ -66,7 +66,7 @@ app.use(
       connectSrc: [
         "'self'",
         "https://region1.google-analytics.com",
-        "https://roadmapr.dev",
+        config.ENVIRONMENT.apiUrl,
       ],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: [

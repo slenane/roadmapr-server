@@ -107,7 +107,11 @@ app.use(
 // ROUTES
 // Middleware to redirect HTTP to HTTPS
 app.use((req, res, next) => {
-  if (req.protocol === "http" && !req.path.includes("/api")) {
+  if (
+    req.protocol === "http" &&
+    !req.path.includes("/api") &&
+    !req.path.includes("/redirect")
+  ) {
     res.redirect(301, `https://${req.headers.host}${req.url}`);
   } else {
     next(); // Continue to other routes if already HTTPS or accessing API
@@ -116,7 +120,11 @@ app.use((req, res, next) => {
 
 // Middleware to ensure www subdomain
 app.use((req, res, next) => {
-  if (!req.headers.host.startsWith("www.") && !req.path.includes("/api")) {
+  if (
+    !req.headers.host.startsWith("www.") &&
+    !req.path.includes("/api") &&
+    !req.path.includes("/redirect")
+  ) {
     res.redirect(301, `https://www.${req.headers.host}${req.url}`);
   } else {
     next(); // Continue to other routes if already www subdomain or accessing API

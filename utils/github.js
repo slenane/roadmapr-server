@@ -66,20 +66,26 @@ const getFeaturedRepo = async (url, token, next) => {
 
       const featuredRepo = [...repos.data][0];
 
-      const repoLanguages = await axios({
-        url: featuredRepo.languages_url,
-        method: "GET",
-        ...(token ? { headers: { Authorization: "token" + " " + token } } : {}),
-      });
+      if (featuredRepo) {
+        const repoLanguages = await axios({
+          url: featuredRepo?.languages_url,
+          method: "GET",
+          ...(token
+            ? { headers: { Authorization: "token" + " " + token } }
+            : {}),
+        });
 
-      return {
-        createdAt: featuredRepo.created_at,
-        updatedAt: featuredRepo.updated_at,
-        link: featuredRepo.html_url,
-        name: featuredRepo.name,
-        description: featuredRepo.description,
-        languages: repoLanguages.data,
-      };
+        return {
+          createdAt: featuredRepo.created_at,
+          updatedAt: featuredRepo.updated_at,
+          link: featuredRepo.html_url,
+          name: featuredRepo.name,
+          description: featuredRepo.description,
+          languages: repoLanguages.data,
+        };
+      }
+
+      return null;
     }
   } catch (error) {
     next(error);

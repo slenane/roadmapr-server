@@ -17,7 +17,7 @@ const Http404Error = require("../utils/errorHandling/http404Error");
 const Http500Error = require("../utils/errorHandling/http500Error");
 const ALERTS = require("../utils/alerts");
 const validPasswordRegex =
-  /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,20}$/;
+  /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[^\w\s])[a-zA-Z0-9\S]{6,20}$/;
 const emailRegex = /^\S+@\S+\.\S+$/;
 const { updateUserGithubData } = require("../utils/github");
 const sgMail = require("@sendgrid/mail");

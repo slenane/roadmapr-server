@@ -159,7 +159,7 @@
         "EMAIL_USED": "Email already in use, please log in or try a different email",
         "EMAIL_NOT_VERIFIED": "Please verify your email to continue",
         "PASSWORD_NOT_PROVIDED": "Password not provided",
-        "PASSWORD_INVALID": "Password invalid: Passwords must be at least 6 characters long, contains at least 1 number and 1 special character (!@#$%^&*)",
+        "PASSWORD_INVALID": "Password invalid: Passwords must be at least 6 characters long, containing at least 1 letter, number and special character",
         "USERNAME_PASSWORD_INVALID": "Invalid Username or Password",
         "TOKEN_NOT_PROVIDED": "Token not provided, please try again",
         "GITHUB_USED": "This GitHub Account has already been linked to another roadmapr account, please unlink the other account to continue"
@@ -494,7 +494,7 @@
       "END_DATE": "Completion Date Required"
     },
     "ERROR": {
-      "PASSWORD_PATTERN": "Passwords must be at least 6 characters long, contains at least 1 number and 1 special character (!@#$%^&*)",
+      "PASSWORD_PATTERN": "Passwords must be at least 6 characters long, containing at least 1 letter, number and special character",
       "PASSWORD_PATTERN_SHORT": "Password does not match pattern",
       "PASSWORD_CONFIRM": "Passwords must match",
       "EMAIL_PATTERN": "Input must be an email",
@@ -512,7 +512,7 @@
       "STACK_INVALID": "Programming stack must be provided"
     },
     "HINT": {
-      "PASSWORD": "Passwords must be at least 6 characters long, contains at least 1 number and 1 special character (!@#$%^&*)"
+      "PASSWORD": "Passwords must be at least 6 characters long, containing at least 1 letter, number and special character"
     },
     "REMOVE": {
       "GITHUB": "Unlink GitHub Account"

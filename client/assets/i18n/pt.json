@@ -159,7 +159,7 @@
         "EMAIL_USED": "E-mail já em uso, por favor, faça login ou tente um e-mail diferente",
         "EMAIL_NOT_VERIFIED": "Por favor, verifique seu e-mail para continuar",
         "PASSWORD_NOT_PROVIDED": "Senha não fornecida",
-        "PASSWORD_INVALID": "Senha inválida: Senhas devem ter pelo menos 6 caracteres, contendo pelo menos 1 número e 1 caractere especial (!@#$%^&*)",
+        "PASSWORD_INVALID": "Senha inválida: Senhas devem ter pelo menos 6 caracteres, contendo pelo menos 1 letra, número e caractere especial",
         "USERNAME_PASSWORD_INVALID": "Nome de usuário ou senha inválidos",
         "TOKEN_NOT_PROVIDED": "Token não fornecido, por favor, tente novamente",
         "GITHUB_USED": "Esta conta do GitHub já foi vinculada a outra conta do roadmapr, por favor, desvincule a outra conta para continuar"
@@ -494,7 +494,7 @@
       "END_DATE": "Data de Conclusão Obrigatória"
     },
     "ERROR": {
-      "PASSWORD_PATTERN": "As senhas devem ter pelo menos 6 caracteres, conter pelo menos 1 número e 1 caractere especial (!@#$%^&*)",
+      "PASSWORD_PATTERN": "As senhas devem ter pelo menos 6 caracteres, contendo pelo menos 1 letra, número e caractere especial",
       "PASSWORD_PATTERN_SHORT": "A senha não corresponde ao padrão",
       "PASSWORD_CONFIRM": "As senhas devem corresponder",
       "EMAIL_PATTERN": "O input deve ser um email",
@@ -512,7 +512,7 @@
       "STACK_INVALID": "A pilha de programação deve ser fornecida"
     },
     "HINT": {
-      "PASSWORD": "As senhas devem ter pelo menos 6 caracteres, conter pelo menos 1 número e 1 caractere especial (!@#$%^&*)"
+      "PASSWORD": "As senhas devem ter pelo menos 6 caracteres, contendo pelo menos 1 letra, número e caractere especial"
     },
     "REMOVE": {
       "GITHUB": "Desvincular Conta do GitHub"

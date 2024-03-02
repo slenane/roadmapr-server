@@ -29,21 +29,22 @@ const updateUserGithubData = async (user, github, token, next) => {
     if (github) {
       roadmap.github = {
         lastUpdated: new Date(),
-        avatar: github.avatar_url,
-        bio: github.bio,
-        url: github.url,
-        link: github.html_url,
-        name: github.name,
-        login: github.login,
-        publicRepos: github.public_repos,
-        privateRepos: github.total_private_repos
-          ? github.total_private_repos
-          : roadmap.github.privateRepos,
-        followers: github.followers,
-        reposUrl: github.repos_url,
-        followers: github.followers,
-        following: github.following,
-        featuredRepo: await getFeaturedRepo(github.repos_url, token, next),
+        ...(github?.avatar_url && { avatar: github.avatar_url }),
+        ...(github?.bio && { bio: github.bio }),
+        ...(github?.url && { url: github.url }),
+        ...(github?.html_url && { link: github.html_url }),
+        ...(github?.name && { name: github.name }),
+        ...(github?.login && { login: github.login }),
+        ...(github?.public_repos && { publicRepos: github.public_repos }),
+        ...(github?.total_private_repos && {
+          privateRepos: github.total_private_repos,
+        }),
+        ...(github?.repos_url && { reposUrl: github.repos_url }),
+        ...(github?.followers && { followers: github.followers }),
+        ...(github?.following && { following: github.following }),
+        ...(github?.repos_url && {
+          featuredRepo: await getFeaturedRepo(github.repos_url, token, next),
+        }),
       };
 
       await roadmap.save();
@@ -76,12 +77,18 @@ const getFeaturedRepo = async (url, token, next) => {
         });
 
         return {
-          createdAt: featuredRepo.created_at,
-          updatedAt: featuredRepo.updated_at,
-          link: featuredRepo.html_url,
-          name: featuredRepo.name,
-          description: featuredRepo.description,
-          languages: repoLanguages.data,
+          ...(featuredRepo?.created_at && {
+            createdAt: featuredRepo.created_at,
+          }),
+          ...(featuredRepo?.updated_at && {
+            updatedAt: featuredRepo.updated_at,
+          }),
+          ...(featuredRepo?.html_url && { link: featuredRepo.html_url }),
+          ...(featuredRepo?.name && { name: featuredRepo.name }),
+          ...(featuredRepo?.description && {
+            description: featuredRepo.description,
+          }),
+          ...(repoLanguages?.data && { languages: repoLanguages.data }),
         };
       }
 

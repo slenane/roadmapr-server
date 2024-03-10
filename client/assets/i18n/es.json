@@ -255,32 +255,42 @@
     }
   },
   "LANDING": {
-    "TAGLINE": "Tu roadmap personal hacia una carrera en desarrollo de software",
+    "WELCOME": "Bienvenido a roadmapr",
+    "TAGLINE_1": "Tu ",
+    "TAGLINE_2": "roadmap",
+    "TAGLINE_3": " personal hacia una carrera en desarrollo de software",
     "DESCRIPTION": {
-      "T": "¿Qué es roadmapr?",
-      "P1": "roadmapr es una plataforma gratuita diseñada para desarrolladores autodidactas, permitiéndoles organizar y seguir su progreso mientras reciben recomendaciones de usuarios que se han convertido en desarrolladores profesionales.",
-      "P2": "Nuestro objetivo es ofrecer un camino claro para convertirse en un desarrollador profesional al recopilar recomendaciones de una red global de usuarios. Basándote en estas sugerencias, puedes construir tu propio plan personal, mantener el enfoque y alcanzar tu meta."
+      "T_1": "¿Qué es ",
+      "T_2": "roadmapr",
+      "T_3": "?",
+      "B1_1": "Plataforma gratuita para desarrolladores",
+      "B1_2": "Proporcionando un camino claro hacia una carrera en desarrollo de software.",
+      "B2_1": "Organiza tu aprendizaje y sigue tu progreso",
+      "B2_2": "Mantente adelante de la competencia teniendo un plan claro.",
+      "B3_1": "Recibe recomendaciones personalizadas",
+      "B3_2": "Nuestras recomendaciones personalizadas pueden ayudarte a cumplir con los requisitos para el empleo en tu país.",
+      "B4_1": "Visualiza y comparte tus logros",
+      "B4_2": "Observa cómo crece tu conjunto de habilidades en tiempo real mientras construyes tu roadmap personal."
     },
-    "EDUCATION": {
-      "T": "Rastrea y comparte tu progreso",
-      "P1": "Construye tu roadmap personal agregando tu educación, proyectos y experiencia laboral para obtener una imagen completa de tu progreso.",
-      "P2": "Recibe recomendaciones de usuarios que han asegurado posiciones con una pila tecnológica y ubicación similares.",
-      "P3": "Consulta las últimas oportunidades de trabajo remoto para ayudarte a mantenerte enfocado en tu objetivo."
+    "ORGANIZE": {
+      "T": "Organiza y sigue",
+      "P": "Planifica cuidadosamente tu aprendizaje para ser lo más eficiente posible."
+    },
+    "VISUALIZE": {
+      "T": "Progreso en tiempo real",
+      "P": "Mantente motivado al alcanzar hitos en tu camino de desarrollo.",
+      "P1": "Sigue pilas tecnológicas populares para asegurarte de construir una roadmap equilibrada que te llevará a una carrera exitosa.",
+      "P2": "O crea tu propio camino personalizado basado en lo que encuentres más interesante.",
+      "P3": "Obtén información sobre el tipo de desarrollador que eres y dónde necesitas mejorar.",
+      "P4": "Combinamos educación, proyectos y experiencia laboral para darte una imagen completa de tu conjunto de habilidades."
     },
     "RESUME": {
       "T": "Crea tu currículum",
-      "P1": "Visualiza tu progreso en un formato de currículum, facilitando la solicitud de empleo.",
-      "P2": "Agrega descripciones a cada elemento para recordar fácilmente lo que aprendiste cuando llegue el momento de una entrevista.",
-      "P3": "Destácate entre otros candidatos incluyendo todos los cursos que has tomado y los proyectos que has construido."
-    },
-    "ROADMAP": {
-      "T": "Visualiza tu progreso en tiempo real",
-      "P1": "Selecciona una pila de programación y desarrolla tus habilidades para asegurar una posición como desarrollador profesional.",
-      "P2": "Rastrea tu progreso, obtén información sobre el tipo de desarrollador que eres e identifica áreas de mejora.",
-      "P3": "Integra tu cuenta de GitHub para monitorear tus repositorios y contribuciones de manera fluida."
+      "P1": "Destácate de la competencia construyendo tu CV de desarrollador desde el primer día.",
+      "P2": "Diferénciate de otros candidatos incluyendo todos los cursos que has tomado y los proyectos que has construido."
     },
     "CTA": {
-      "T": "Comienza tu viaje hacia una carrera en desarrollo de software hoy",
+      "T": "Comienza tu camino hacia una carrera en desarrollo de software hoy",
       "BUTTON": "Regístrate gratis"
     },
     "FOOTER": {

@@ -255,32 +255,42 @@
     }
   },
   "LANDING": {
-    "TAGLINE": "Seu roadmap pessoal para uma carreira em desenvolvimento de software",
+    "WELCOME": "Bem-vindo ao roadmapr",
+    "TAGLINE_1": "Sua ",
+    "TAGLINE_2": "roadmap",
+    "TAGLINE_3": " pessoal para uma carreira em desenvolvimento de software",
     "DESCRIPTION": {
-      "T": "O que é o roadmapr?",
-      "P1": "roadmapr é uma plataforma gratuita destinada a desenvolvedores autodidatas, permitindo que organizem e acompanhem seu progresso enquanto recebem recomendações de usuários que se tornaram desenvolvedores profissionais.",
-      "P2": "Nosso objetivo é fornecer um caminho claro para se tornar um desenvolvedor profissional, ao criar recomendações de uma rede global de usuários. Com base nessas sugestões, você pode elaborar seu próprio roteiro pessoal, manter o foco e alcançar sua meta."
+      "T_1": "O que é ",
+      "T_2": "roadmapr",
+      "T_3": "?",
+      "B1_1": "Plataforma gratuita para desenvolvedores",
+      "B1_2": "Fornecendo um caminho claro para uma carreira em desenvolvimento de software.",
+      "B2_1": "Organize seu aprendizado e acompanhe seu progresso",
+      "B2_2": "Mantenha-se à frente da concorrência tendo um plano claro.",
+      "B3_1": "Receba recomendações personalizadas",
+      "B3_2": "Nossas recomendações personalizadas podem ajudá-lo a atender aos requisitos para o emprego em seu país.",
+      "B4_1": "Visualize e compartilhe suas conquistas",
+      "B4_2": "Veja seu conjunto de habilidades crescer em tempo real enquanto constrói seu roadmap pessoal."
     },
-    "EDUCATION": {
-      "T": "Acompanhe e compartilhe seu progresso",
-      "P1": "Construa seu roadmap pessoal adicionando sua educação, projetos e experiência de trabalho para ter uma visão completa do seu progresso.",
-      "P2": "Receba recomendações de usuários que conseguiram posições com uma pilha tecnológica e localização semelhantes.",
-      "P3": "Explore as últimas oportunidades de trabalho remoto para ajudá-lo a manter o foco em seu objetivo."
+    "ORGANIZE": {
+      "T": "Organize e acompanhe",
+      "P": "Planeje cuidadosamente seu aprendizado para ser o mais eficiente possível."
+    },
+    "VISUALIZE": {
+      "T": "Progresso em tempo real",
+      "P": "Mantenha-se motivado ao atingir marcos em seu caminho de desenvolvimento.",
+      "P1": "Siga pilhas tecnológicas populares para garantir que esteja construindo um roadmap equilibrado que o leve a uma carreira bem-sucedida.",
+      "P2": "Ou crie seu próprio caminho personalizado com base no que você achar mais interessante.",
+      "P3": "Obtenha insights sobre o tipo de desenvolvedor que você é e onde precisa melhorar.",
+      "P4": "Nós combinamos educação, projetos e experiência de trabalho para lhe dar uma imagem completa de seu conjunto de habilidades."
     },
     "RESUME": {
-      "T": "Crie seu currículo",
-      "P1": "Veja seu progresso em um estilo de currículo, facilitando a candidatura a empregos.",
-      "P2": "Adicione descrições a cada item para facilitar lembrar o que aprendeu quando chegar a hora da entrevista.",
-      "P3": "Destaque-se entre outros candidatos incluindo todos os cursos que fez e os projetos que desenvolveu."
-    },
-    "ROADMAP": {
-      "T": "Veja seu progresso em tempo real",
-      "P1": "Escolha uma pilha de programação e desenvolva suas habilidades para garantir uma posição como desenvolvedor profissional.",
-      "P2": "Acompanhe seu progresso, obtenha insights sobre o tipo de desenvolvedor que você é e identifique áreas para melhorar.",
-      "P3": "Integre sua conta do GitHub para monitorar seus repositórios e contribuições de forma transparente."
+      "T": "Construa seu currículo",
+      "P1": "Destaque-se da concorrência construindo seu CV de desenvolvedor desde o primeiro dia.",
+      "P2": "Diferencie-se de outros candidatos incluindo todos os cursos que você fez e os projetos que construiu."
     },
     "CTA": {
-      "T": "Inicie sua jornada para uma carreira em desenvolvimento de software hoje",
+      "T": "Comece sua jornada rumo a uma carreira em desenvolvimento de software hoje",
       "BUTTON": "Cadastre-se gratuitamente"
     },
     "FOOTER": {

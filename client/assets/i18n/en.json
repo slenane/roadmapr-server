@@ -10,9 +10,10 @@
   },
   "ROUTES": {
     "LANDING": "roadmapr - your roadmap to a career in software development",
+    "EXPLORE": "Explore | roadmapr",
     "PRIVACY_POLICY": "Privacy Policy | roadmapr",
     "LOGIN": "Log in | roadmapr",
-    "REGISTER": "Register | roadmapr",
+    "REGISTER": "Sign Up | roadmapr",
     "BLOG": "Blog | roadmapr",
     "ABOUT": "About | roadmapr",
     "CONTACT": "Contact | roadmapr",
@@ -255,29 +256,39 @@
     }
   },
   "LANDING": {
-    "TAGLINE": "Your personal roadmap to a career in software development",
+    "WELCOME": "Welcome to roadmapr",
+    "TAGLINE_1": "Your personal ",
+    "TAGLINE_2": "roadmap",
+    "TAGLINE_3": " to a career in software development",
     "DESCRIPTION": {
-      "T": "What is roadmapr?",
-      "P1": "roadmapr is a free-to-use platform designed for self-taught developers to organize and track their progress while receiving recommendations from users who have become professional developers.",
-      "P2": "Our aim is to provide a clear path to becoming a professional developer by curating recommendations from a global network of users. Based on these suggestions, you can construct your own personal roadmap, stay focused, and achieve your goal."
+      "T_1": "What is ",
+      "T_2": "roadmapr",
+      "T_3": "?",
+      "B1_1": "Free-to-use platform for developers",
+      "B1_2": "Providing a clear path to a career in software development",
+      "B2_1": "Organize your learning and track your progress",
+      "B2_2": "Stay ahead of the competition by having a clear plan.",
+      "B3_1": "Receive personalized recommendations",
+      "B3_2": "Our personalized recommendations can help you meet the requirements for employment in your country.",
+      "B4_1": "Visualize and share your achievements",
+      "B4_2": "Watch your skillset grow in real-time as your build your personal roadmap."
     },
-    "EDUCATION": {
-      "T": "Track and share your progress",
-      "P1": "Build your personal roadmap by adding your education, projects and work experience to get a full picture of your progress.",
-      "P2": "Receive recommendations from users who have successfully secured positions with a similar tech stack and location.",
-      "P3": "Browse the latest remote opportunities to help you stay focused on your goal."
+    "ORGANIZE": {
+      "T": "Organize and track",
+      "P": "Carefully plan your learning to be as efficient as possible."
+    },
+    "VISUALIZE": {
+      "T": "Real-time progress",
+      "P": "Stay motivated through hitting milestones on your development path.",
+      "P1": "Follow popular tech stacks to ensure you are building a balanced roadmap that will lead to a successful career.",
+      "P2": "Or create your own custom path based on what you are find most interesting.",
+      "P3": "Gain insights into the type of developer you are and where you need to improve.",
+      "P4": "We combine education, projects and work experience to give you a full picture of your skillset."
     },
     "RESUME": {
       "T": "Build your resume",
-      "P1": "View your progress in a resume style, making it easier to apply for jobs.",
-      "P2": "Add descriptions of each item to make it easy to remember what your learned when it comes time for an interview.",
-      "P3": "Stand out from other candidates by including all the courses you have taken and the projects you have built."
-    },
-    "ROADMAP": {
-      "T": "View your progress in real time",
-      "P1": "Select a programming stack and build your skills to secure a position as a professional developer.",
-      "P2": "Track your progress, gain insights on the type of developer you are and identify areas for improvement.",
-      "P3": "Integrate your GitHub account to monitor your repositories and contributions seamlessly."
+      "P1": "Stand out from the competition by building your developer CV from day one.",
+      "P2": "Stand out from other candidates by including all the courses you have taken and the projects you have built."
     },
     "CTA": {
       "T": "Start your journey to a career in software development today",
@@ -293,7 +304,7 @@
     "LOG_IN": {
       "T": "Log In",
       "FORGOT_PASSWORD": "Forgot Password?",
-      "NOT_REGISTERED": "Not Registered?",
+      "NOT_REGISTERED": "Not signed up yet?",
       "EMAIL_VERIFIED": "Email verified successfully!"
     },
     "LOG_OUT": {
@@ -301,8 +312,8 @@
       "ARE_YOU_SURE": "Are you sure you want to log out?"
     },
     "REGISTER": {
-      "T": "Register",
-      "ALREADY_REGISTERED": "Already Registered?",
+      "T": "Sign Up",
+      "ALREADY_REGISTERED": "Already signed up?",
       "VERIFY_EMAIL_HEADER": "Please verify your email",
       "VERIFY_EMAIL_MESSAGE_1": "A verification email has been sent to ",
       "VERIFY_EMAIL_MESSAGE_2": "If you have not received the verification email within 60 seconds you can resend it by clicking the button below",
@@ -315,7 +326,7 @@
     },
     "O_AUTH": {
       "GITHUB_LOGIN": "Log in with GitHub",
-      "GITHUB_REGISTRATION": "Register with GitHub"
+      "GITHUB_REGISTRATION": "Sign up with GitHub"
     }
   },
   "ONBOARDING": {

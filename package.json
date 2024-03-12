@@ -7,7 +7,8 @@
     "node": "18"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "heroku": "git push heroku main"
   },
   "author": "Stephen Lenane <info@roadmapr.dev>",
   "license": "ISC",

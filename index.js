@@ -12,6 +12,7 @@ const config = require("./config");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const helmet = require("helmet");
+const xmlbuilder = require("xmlbuilder");
 const {
   logError,
   logErrorMiddleware,
@@ -131,6 +132,99 @@ app.use("/api/education", educationRoutes);
 app.use("/api/projects", projectsRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/recommendations", recommendationsRoutes);
+
+// XML SITEMAP GENERATION
+const ROUTES = [
+  { url: "/", lastmod: "2024-03-16", changefreq: "weekly", priority: 1.0 },
+  {
+    url: "/privacy-policy",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.7,
+  },
+  { url: "/login", lastmod: "2024-03-16", changefreq: "weekly", priority: 0.8 },
+  {
+    url: "/register",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.8,
+  },
+  {
+    url: "/verify-email",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.7,
+  },
+  {
+    url: "/onboarding",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.8,
+  },
+  {
+    url: "/roadmap",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.9,
+  },
+  {
+    url: "/experience",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.9,
+  },
+  {
+    url: "/projects",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.9,
+  },
+  {
+    url: "/education",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.9,
+  },
+  {
+    url: "/profile",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.9,
+  },
+  {
+    url: "/settings",
+    lastmod: "2024-03-16",
+    changefreq: "weekly",
+    priority: 0.8,
+  },
+];
+app.get("/sitemap.xml", (req, res) => {
+  const root = xmlbuilder.create("urlset", {
+    version: "1.0",
+    encoding: "UTF-8",
+  });
+  root.att("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
+
+  ROUTES.forEach((route) => {
+    const url = root.ele("url");
+    url.ele("loc", `https://${req.headers.host}${route.url}`);
+    url.ele("lastmod", route.lastmod);
+    url.ele("changefreq", route.changefreq);
+    url.ele("priority", route.priority);
+  });
+
+  res.header("Content-Type", "application/xml");
+  res.send(root.end({ pretty: true }));
+});
+
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+
+  res.send(`
+    User-agent: *
+    Sitemap: https://${req.headers.host}/sitemap.xml
+  `);
+});
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "client/index.html"));

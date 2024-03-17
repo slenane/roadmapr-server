@@ -13,6 +13,7 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 const helmet = require("helmet");
 const xmlbuilder = require("xmlbuilder");
+const http = require("http");
 const {
   logError,
   logErrorMiddleware,
@@ -246,7 +247,14 @@ process.on("uncaughtException", (error) => {
   }
 });
 
+// Keep Heroku awake by pinging every 29 minutes
+setInterval(() => {
+  http.get("http://www.roadmapr.dev/ping");
+}, 29 * 60 * 1000);
+
 // LISTENING
 app.listen(process.env.PORT || 3000, () => {
   console.log("Serving on port 3000");
 });
+
+// heroku logs --source app -n 1500 | Select-String "GET /" | Select-String -NotMatch "\.(jpg|jpeg|png|gif|css|js|svg|webp|ico|woff2)"

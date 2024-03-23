@@ -256,5 +256,3 @@ setInterval(() => {
 app.listen(process.env.PORT || 3000, () => {
   console.log("Serving on port 3000");
 });
-
-// heroku logs --source app -n 1500 | Select-String "GET /" | Select-String -NotMatch "\.(jpg|jpeg|png|gif|css|js|svg|webp|ico|woff2)"

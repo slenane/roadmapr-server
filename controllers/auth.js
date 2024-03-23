@@ -92,7 +92,7 @@ const register = async (req, res, next) => {
   }
 };
 
-const resendRegisterEmail = async (req, res) => {
+const resendRegisterEmail = async (req, res, next) => {
   try {
     const user = await User.findOne({
       email: req.body.email,
@@ -122,7 +122,7 @@ const resendRegisterEmail = async (req, res) => {
   }
 };
 
-const verifyEmail = async (req, res) => {
+const verifyEmail = async (req, res, next) => {
   try {
     const user = await User.findOne({
       "emailVerification.emailToken": req.query.token,

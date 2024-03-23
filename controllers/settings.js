@@ -136,7 +136,7 @@ const updateEmail = async (req, res, next) => {
   }
 };
 
-const verifyEmailUpdate = async (req, res) => {
+const verifyEmailUpdate = async (req, res, next) => {
   try {
     const user = await User.findOne({
       "emailVerification.emailToken": req.query.token,

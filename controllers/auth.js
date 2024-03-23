@@ -128,18 +128,10 @@ const verifyEmail = async (req, res, next) => {
       "emailVerification.emailToken": req.query.token,
     });
 
-    if (!user) {
-      res.redirect(config.ENVIRONMENT.apiUrl + "/login");
-      throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
+    if (user && user.emailVerification) {
+      user.emailVerification.isVerified = true;
+      await user.save();
     }
-
-    if (user && user.emailVerification.isVerified) {
-      res.redirect(config.ENVIRONMENT.apiUrl + "/login?verified=true");
-      return;
-    }
-
-    user.emailVerification.isVerified = true;
-    await user.save();
 
     res.redirect(config.ENVIRONMENT.apiUrl + "/login?verified=true");
   } catch (error) {

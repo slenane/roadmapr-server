@@ -143,11 +143,11 @@ const verifyEmailUpdate = async (req, res, next) => {
     });
 
     if (!user) {
+      res.redirect(config.ENVIRONMENT.apiUrl + "/login");
       throw new Http404Error(ALERTS.AUTH.ERROR.USER_NOT_FOUND);
     }
 
     user.email = user.emailVerification.updatedEmail;
-    user.emailVerification.emailToken = null;
     user.emailVerification.updatedEmail = null;
 
     await user.save();

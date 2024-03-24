@@ -52,6 +52,7 @@ const getRecommendations = async (req, res, next) => {
         return (
           !!recommendation.title &&
           !!recommendation.author &&
+          !!recommendation.description &&
           (recommendation.recommended / recommendation.count) * 100 >= 90
         );
       })
